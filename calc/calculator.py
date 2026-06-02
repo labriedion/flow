@@ -307,12 +307,20 @@ class Calculator:
         if op == "%":
             if b == 0:
                 raise CalcError("modulo by zero")
-            return math.fmod(a, b)
+            return a % b  # Python semantics: result has the sign of the divisor
         if op == "^":
             try:
-                return float(a ** b)
-            except (ValueError, OverflowError) as exc:
+                result = a ** b
+            except (ValueError, OverflowError, ZeroDivisionError) as exc:
                 raise CalcError(f"cannot evaluate power: {exc}")
+            # A fractional power of a negative base yields a complex number,
+            # which this real-valued calculator reports as an error rather than
+            # letting a raw TypeError escape.
+            if isinstance(result, complex):
+                raise CalcError(
+                    "result is complex (fractional power of a negative number)"
+                )
+            return float(result)
         raise CalcError(f"unknown operator {op!r}")  # pragma: no cover
 
     def _eval_call(self, node: Call) -> float:

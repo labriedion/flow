@@ -5,6 +5,23 @@ language pipeline: tokenizer → parser → evaluator. Use it one-shot, as an
 interactive REPL, or as a library. Pure Python standard library, with a real
 test suite.
 
+### Example session
+
+```
+» 2 ^ 3 ^ 2            # right-associative: 2^(3^2)
+512
+» -2 ^ 2              # unary minus binds looser than ^
+-4
+» radius = 5
+5
+» area = pi * radius ^ 2
+78.53981634
+» (-8) ^ 0.5          # fractional power of a negative -> clean error, no crash
+error: result is complex (fractional power of a negative number)
+```
+
+The full transcript is in [`examples/session.txt`](examples/session.txt).
+
 ```
 calc/
   calculator.py   # tokenizer, precedence-climbing parser, evaluator

@@ -87,10 +87,18 @@ def test_parse_errors(bad):
     "unknownvar", "nope(2)",     # unknown name / function
     "sqrt(1, 2)", "max()",       # wrong arity / variadic with no args
     "sqrt(-1)",                  # math domain error surfaces as CalcError
+    "(-8) ^ 0.5",               # fractional power of a negative -> complex
+    "0 ^ -1",                   # zero to a negative power
 ])
 def test_eval_errors(bad):
     with pytest.raises(CalcError):
         evaluate(bad)
+
+
+def test_modulo_follows_python_sign_semantics():
+    # Result takes the sign of the divisor, matching Python's % (not C fmod).
+    assert evaluate("-7 % 3") == 2
+    assert evaluate("7 % -3") == -2
 
 
 def test_cannot_assign_to_reserved_names():
@@ -121,3 +129,30 @@ def test_format_result(value, text):
 
 def test_whitespace_is_ignored():
     assert evaluate("  2   *  (  3 + 4 ) ") == 14
+
+
+# ---- CLI -----------------------------------------------------------------
+
+def test_cli_one_shot(capsys):
+    from .cli import main
+    assert main(["2 + 3 * 4"]) == 0
+    assert capsys.readouterr().out.strip() == "14"
+
+
+def test_cli_leading_minus_expression(capsys):
+    from .cli import main
+    assert main(["-2^2"]) == 0          # must not be parsed as a flag
+    assert capsys.readouterr().out.strip() == "-4"
+
+
+def test_cli_reports_errors_with_nonzero_exit(capsys):
+    from .cli import main
+    assert main(["1 / 0"]) == 1
+    assert "zero" in capsys.readouterr().err.lower()
+
+
+def test_cli_complex_power_is_clean_error(capsys):
+    # Regression: must surface as a CalcError message, not a raw traceback.
+    from .cli import main
+    assert main(["(-8)^0.5"]) == 1
+    assert "complex" in capsys.readouterr().err.lower()
