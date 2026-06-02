@@ -4,6 +4,14 @@ A generative ambient music engine that runs entirely in the browser — no
 samples, no libraries, no build step. Every session is improvised on the fly,
 so it's never the same twice. Just open `index.html` and press **Play**.
 
+![Waveform of a generated Driftwave clip](examples/waveform.png)
+
+*🎧 **Listen:** [`examples/driftwave-sample.wav`](examples/driftwave-sample.wav)
+(16s). Both the clip and the waveform above were synthesized by a pure-Python
+port of the engine's voices — see
+[`tools/gen_driftwave.py`](../tools/gen_driftwave.py). You can see the
+rhythmic plucks fire and decay over the sustained pad swells.*
+
 ```
 driftwave/
   index.html   # UI shell
