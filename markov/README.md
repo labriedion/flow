@@ -5,6 +5,23 @@ and it will babble in the same style — coherent locally, surprising globally.
 Works on **words** (prose-like output) or **characters** (pronounceable
 invented words). Pure Python standard library, with a real test suite.
 
+### Example output
+
+Trained on the included `corpus.txt` (the opening of *Pride and Prejudice*):
+
+```
+$ python -m markov.cli corpus.txt --order 2 --length 50 --seed 11
+
+It is a truth universally acknowledged, that a single man in possession of a
+wife. However little known the feelings or views of such a man may be on his
+first entering a neighbourhood, this truth is so well fixed in the minds of
+the surrounding families, that he is
+```
+
+Notice how order 2 recombines the source into new-but-plausible sentences.
+More samples (including character-level "invented words") are in
+[`examples/sample_output.txt`](examples/sample_output.txt).
+
 ```
 markov/
   markov.py        # the chain: training, sampling, two tokenization modes
