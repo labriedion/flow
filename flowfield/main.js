@@ -7,29 +7,38 @@ const field = new FlowField(canvas);
 
 // ---- Slider bindings ----------------------------------------------------
 // Each entry maps a slider id to how its value should be applied and shown.
+// `invert` makes a slider read intuitively when the underlying param runs the
+// other way: the fade param is "how fast trails disappear", but users think in
+// terms of "trail length", so the slider value maps to fade = invert - value.
+const FADE_SUM = 0.255; // min(0.005) + max(0.25) of the fade slider range
 const sliders = [
   { id: 'count', apply: (v) => field.setCount(v), fmt: (v) => v | 0 },
   { id: 'speed', key: 'speed', fmt: (v) => v.toFixed(1) },
   { id: 'noiseScale', key: 'noiseScale', fmt: (v) => v.toFixed(4) },
   { id: 'curl', key: 'curl', fmt: (v) => v.toFixed(1) },
   { id: 'timeWarp', key: 'timeWarp', fmt: (v) => v.toFixed(4) },
-  { id: 'fade', key: 'fade', fmt: (v) => v.toFixed(3), invertLabel: true },
+  {
+    id: 'fade', key: 'fade', invert: FADE_SUM,
+    fmt: (raw) => `${Math.round((raw / 0.25) * 100)}%`, // higher = longer trail
+  },
   { id: 'lineWidth', key: 'lineWidth', fmt: (v) => v.toFixed(1) },
 ];
 
 function syncSlider(s) {
   const el = document.getElementById(s.id);
-  const val = parseFloat(el.value);
-  document.getElementById(s.id + 'Val').textContent = s.fmt(val);
-  if (s.apply) s.apply(val);
-  else field.params[s.key] = val;
+  const raw = parseFloat(el.value);
+  document.getElementById(s.id + 'Val').textContent = s.fmt(raw);
+  const applied = s.invert != null ? s.invert - raw : raw;
+  if (s.apply) s.apply(applied);
+  else field.params[s.key] = applied;
 }
 
 for (const s of sliders) {
   const el = document.getElementById(s.id);
-  // Initialize slider position from the engine's defaults.
-  const initial = s.id === 'count' ? field.params.count : field.params[s.key];
-  el.value = initial;
+  // Initialize slider position from the engine's defaults, undoing any inversion
+  // so the thumb lands where the default param actually sits.
+  const param = s.id === 'count' ? field.params.count : field.params[s.key];
+  el.value = s.invert != null ? s.invert - param : param;
   syncSlider(s);
   el.addEventListener('input', () => syncSlider(s));
 }
@@ -82,7 +91,8 @@ function surprise() {
   set('noiseScale', rnd(0.0008, 0.004));
   set('curl', rnd(1, 5));
   set('timeWarp', rnd(0.0003, 0.0025));
-  set('fade', rnd(0.02, 0.12));
+  // Slider is inverted (raw = sum - fade); aim for longish trails (fade 0.02–0.12).
+  set('fade', FADE_SUM - rnd(0.02, 0.12));
   set('lineWidth', rnd(0.6, 2));
   selectPalette((Math.random() * PALETTES.length) | 0);
   field.reseed();

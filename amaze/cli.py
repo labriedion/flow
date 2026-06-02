@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from .maze import GENERATORS, SOLVERS
+from .maze import GENERATORS, SOLVERS, braid, dead_ends
 from .render import render
 
 
@@ -31,6 +31,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="pathfinding algorithm for the solution overlay",
     )
     p.add_argument("--seed", type=int, default=None, help="random seed for reproducibility")
+    p.add_argument(
+        "--braid", type=float, default=0.0, metavar="FRACTION",
+        help="remove this fraction (0-1) of dead ends, adding loops",
+    )
     p.add_argument("--no-solve", action="store_true", help="do not overlay a solution")
     p.add_argument("--no-color", action="store_true", help="disable ANSI colors")
     return p
@@ -43,15 +47,27 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     maze = GENERATORS[args.algo](args.width, args.height, args.seed)
+    if args.braid > 0:
+        # Offset the seed so the braid pass isn't correlated with generation.
+        braid(maze, args.braid, None if args.seed is None else args.seed + 1)
+
     path = None
     if not args.no_solve:
         path = SOLVERS[args.solver](maze)
 
     print(render(maze, path, color=not args.no_color))
 
+    de = len(dead_ends(maze))
+    bits = [
+        f"{args.algo} maze",
+        f"{args.width}×{args.height}",
+        f"{de} dead ends",
+    ]
+    if args.braid > 0:
+        bits.append("braided (has loops)")
     if path is not None:
-        print(f"\n{args.algo} maze · {args.solver} path · "
-              f"{len(path)} cells from S to G")
+        bits.append(f"{args.solver} path: {len(path)} cells")
+    print("\n" + " · ".join(bits))
     return 0
 
 

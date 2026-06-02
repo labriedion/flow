@@ -43,7 +43,6 @@ bindRange('volume', 'volume', (v) => `${Math.round(v * 100)}%`);
 
 scaleSel.addEventListener('change', () => {
   engine.setParam('scaleName', scaleSel.value);
-  document.getElementById('scaleName').textContent = '';
 });
 rootSel.addEventListener('change', () => {
   engine.setParam('rootIndex', parseInt(rootSel.value, 10));

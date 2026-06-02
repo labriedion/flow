@@ -8,7 +8,7 @@ generation is reproducible under a fixed seed.
 from .maze import (
     Maze, N, S, E, W, DX, DY, OPPOSITE,
     generate_backtracker, generate_prim, GENERATORS,
-    solve_bfs, solve_astar,
+    solve_bfs, solve_astar, braid, dead_ends,
 )
 
 
@@ -99,3 +99,45 @@ def test_carve_out_of_bounds_raises():
 def test_trivial_single_cell():
     maze = generate_prim(1, 1, seed=1)
     assert solve_bfs(maze) == [(0, 0)]
+
+
+@pytest.mark.parametrize("gen", list(GENERATORS.values()))
+def test_full_braid_removes_all_dead_ends(gen):
+    maze = gen(16, 12, seed=3)
+    assert len(dead_ends(maze)) > 0          # a fresh perfect maze has dead ends
+    braid(maze, fraction=1.0, seed=3)
+    assert len(dead_ends(maze)) == 0
+
+
+@pytest.mark.parametrize("gen", list(GENERATORS.values()))
+def test_braid_keeps_maze_connected_and_symmetric(gen):
+    maze = gen(20, 14, seed=8)
+    braid(maze, fraction=0.5, seed=8)
+    assert _count_reachable(maze) == 20 * 14
+    assert _passages_symmetric(maze)
+
+
+def test_partial_braid_reduces_but_keeps_some_dead_ends():
+    maze = generate_backtracker(24, 24, seed=2)
+    before = len(dead_ends(maze))
+    braid(maze, fraction=0.4, seed=2)
+    after = len(dead_ends(maze))
+    assert 0 < after < before
+
+
+def test_braid_is_reproducible():
+    a = generate_prim(18, 18, seed=4)
+    b = generate_prim(18, 18, seed=4)
+    braid(a, 0.7, seed=42)
+    braid(b, 0.7, seed=42)
+    assert a.cells == b.cells
+
+
+def test_braided_solution_still_valid():
+    maze = generate_backtracker(20, 20, seed=6)
+    braid(maze, 1.0, seed=6)
+    path = solve_astar(maze)
+    assert path and path[0] == (0, 0) and path[-1] == (19, 19)
+    assert _path_valid(maze, path)
+    # With loops present, BFS and A* still agree on the *shortest* length.
+    assert len(solve_bfs(maze)) == len(path)

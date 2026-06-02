@@ -26,7 +26,7 @@ flowfield/
 | Noise Scale | zoom of the field — small = sweeping, large = turbulent |
 | Curl | how many rotations the noise maps onto |
 | Time Warp | how fast the field evolves over time |
-| Trail Length | persistence of trails (low fade = long trails) |
+| Trail Length | how long trails linger (right = longer) |
 | Line Width | stroke thickness |
 
 **Mouse:** hold left-click to attract particles, right-click to repel.

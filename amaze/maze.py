@@ -129,6 +129,56 @@ GENERATORS = {
 
 
 # --------------------------------------------------------------------------
+# Post-processing
+# --------------------------------------------------------------------------
+
+def dead_ends(maze: Maze) -> list[tuple[int, int]]:
+    """Cells with exactly one open passage — the tips of the maze's branches."""
+    out = []
+    for y in range(maze.height):
+        for x in range(maze.width):
+            if bin(maze.cells[y][x]).count("1") == 1:
+                out.append((x, y))
+    return out
+
+
+def braid(maze: Maze, fraction: float = 1.0, seed: int | None = None) -> Maze:
+    """Remove a fraction of dead ends by carving one extra passage out of each.
+
+    Braiding turns a "perfect" maze (exactly one path between any two cells)
+    into a "partial braid" with loops, so there are multiple routes to the
+    goal. Because it only *adds* passages it never disconnects the maze. When
+    possible it links a dead end to a neighbouring dead end, dissolving two at
+    once. Mutates and returns the same maze.
+    """
+    rng = random.Random(seed)
+    ends = dead_ends(maze)
+    rng.shuffle(ends)
+    target = int(round(len(ends) * max(0.0, min(1.0, fraction))))
+
+    for (x, y) in ends[:target]:
+        # Skip cells that an earlier braid already opened up.
+        if bin(maze.cells[y][x]).count("1") != 1:
+            continue
+        # Directions we could carve into (in bounds and not already linked).
+        options = []
+        for d in (N, S, E, W):
+            nx, ny = x + DX[d], y + DY[d]
+            if maze.in_bounds(nx, ny) and not maze.linked(x, y, d):
+                options.append(d)
+        if not options:
+            continue
+        # Prefer connecting to another dead end so we resolve two at a time.
+        preferred = [
+            d for d in options
+            if bin(maze.cells[y + DY[d]][x + DX[d]]).count("1") == 1
+        ]
+        d = rng.choice(preferred or options)
+        maze.carve(x, y, d)
+    return maze
+
+
+# --------------------------------------------------------------------------
 # Solving
 # --------------------------------------------------------------------------
 

@@ -38,7 +38,10 @@ Scheduling uses the standard Web Audio "two clocks" pattern: a 25 ms
 look-ahead loop queues note events ~100 ms into the future against the
 sample-accurate `AudioContext` clock, so timing stays tight even when the main
 thread is busy. The reverb is a `ConvolverNode` fed a procedurally generated
-decaying-noise impulse response. The visualizer reads an `AnalyserNode` for a
+decaying-noise impulse response. Plucks are scattered across the stereo field
+with a `StereoPannerNode` for width, and the whole mix runs through a
+`DynamicsCompressorNode` acting as a limiter so stacked pads, plucks and reverb
+tails never clip into distortion. The visualizer reads an `AnalyserNode` for a
 live waveform over a faint spectrum.
 
 > Audio can only start from a user gesture, so nothing plays until you click

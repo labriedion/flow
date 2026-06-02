@@ -16,6 +16,7 @@ amaze/
 ```bash
 python -m amaze.cli --width 30 --height 15
 python -m amaze.cli -W 40 -H 20 --algo prim --solver astar --seed 7
+python -m amaze.cli -W 30 -H 15 --braid 1.0      # loops + shortcuts, no dead ends
 python -m amaze.cli --no-solve --no-color        # just the maze, plain text
 ```
 
@@ -25,8 +26,21 @@ python -m amaze.cli --no-solve --no-color        # just the maze, plain text
 | `--algo` | `backtracker` | `backtracker` (winding) or `prim` (bushy) |
 | `--solver` | `bfs` | `bfs` or `astar` — both find the optimal path |
 | `--seed` | random | fix for reproducible mazes |
+| `--braid` | `0.0` | remove this fraction (0–1) of dead ends, adding loops |
 | `--no-solve` | off | skip the solution overlay |
 | `--no-color` | off | disable ANSI colors |
+
+Every run prints a stats line — dead-end count, size, whether it's braided,
+and the solution length — so you can see how the knobs change the maze.
+
+## Braiding
+
+A freshly generated maze is *perfect*: exactly one path between any two cells.
+`--braid` carves extra passages out of dead ends to create **loops**, so there
+are multiple routes to the goal and the solver gets to pick the genuinely
+shortest one. `--braid 1.0` removes every dead end; partial values (e.g. `0.4`)
+leave some. It only ever adds passages, so the maze always stays fully
+connected.
 
 ## Use it as a library
 

@@ -8,6 +8,8 @@ from .maze import (
     generate_prim,
     solve_bfs,
     solve_astar,
+    braid,
+    dead_ends,
 )
 from .render import render
 
@@ -19,5 +21,7 @@ __all__ = [
     "generate_prim",
     "solve_bfs",
     "solve_astar",
+    "braid",
+    "dead_ends",
     "render",
 ]

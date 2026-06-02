@@ -55,7 +55,18 @@ export class Driftwave {
 
     this.master = ctx.createGain();
     this.master.gain.value = this.params.volume;
-    this.master.connect(ctx.destination);
+
+    // A brick-wall-ish limiter catches the peaks when several pads, plucks and
+    // the reverb tail stack up, so the mix never clips into harsh distortion.
+    this.limiter = ctx.createDynamicsCompressor();
+    this.limiter.threshold.value = -3;
+    this.limiter.knee.value = 0;
+    this.limiter.ratio.value = 20;
+    this.limiter.attack.value = 0.003;
+    this.limiter.release.value = 0.25;
+
+    this.master.connect(this.limiter);
+    this.limiter.connect(ctx.destination);
 
     // Dry/wet split for reverb.
     this.dry = ctx.createGain();
@@ -158,7 +169,18 @@ export class Driftwave {
     g.gain.exponentialRampToValueAtTime(0.22, time + 0.01); // fast attack
     g.gain.exponentialRampToValueAtTime(0.0001, time + 1.6); // long decay
     o.connect(g);
-    g.connect(this.voiceBus);
+
+    // Scatter plucks across the stereo field for a sense of space. Fall back to
+    // a straight connection if StereoPannerNode isn't available.
+    if (ctx.createStereoPanner) {
+      const pan = ctx.createStereoPanner();
+      pan.pan.value = Math.random() * 1.2 - 0.6;
+      g.connect(pan);
+      pan.connect(this.voiceBus);
+    } else {
+      g.connect(this.voiceBus);
+    }
+
     o.start(time);
     o.stop(time + 1.7);
   }
