@@ -42,6 +42,7 @@ export class Driftwave {
     this._timer = null;
     this._nextNoteTime = 0;
     this._step = 0;
+    this._lastDegree = 4;         // current melodic position, for stepwise motion
     this._lookahead = 0.1;        // seconds of scheduling horizon
     this._interval = 25;          // ms between scheduler ticks
   }
@@ -79,10 +80,11 @@ export class Driftwave {
     this.reverb.connect(this.wet);
     this._applyReverbMix();
 
-    // Analyser for the visualizer.
+    // Analyser for the visualizer, tapped off the limiter so it shows the true
+    // post-limiting output that's actually sent to the speakers.
     this.analyser = ctx.createAnalyser();
     this.analyser.fftSize = 1024;
-    this.master.connect(this.analyser);
+    this.limiter.connect(this.analyser);
 
     // A gentle bus that both voices share before the dry/wet split.
     this.voiceBus = ctx.createGain();
@@ -156,6 +158,9 @@ export class Driftwave {
     filter.connect(g);
     g.connect(this.voiceBus);
 
+    // Release the gain/filter chain once the last oscillator finishes so nodes
+    // don't pile up over a long session.
+    oscs[oscs.length - 1].onended = () => { g.disconnect(); filter.disconnect(); };
     oscs.forEach((o) => { o.start(time); o.stop(time + duration + 0.05); });
   }
 
@@ -172,15 +177,19 @@ export class Driftwave {
 
     // Scatter plucks across the stereo field for a sense of space. Fall back to
     // a straight connection if StereoPannerNode isn't available.
+    let tail = g;
     if (ctx.createStereoPanner) {
       const pan = ctx.createStereoPanner();
       pan.pan.value = Math.random() * 1.2 - 0.6;
       g.connect(pan);
       pan.connect(this.voiceBus);
+      tail = pan;
     } else {
       g.connect(this.voiceBus);
     }
 
+    // Free the per-note nodes once the tone has fully decayed.
+    o.onended = () => { g.disconnect(); tail.disconnect(); };
     o.start(time);
     o.stop(time + 1.7);
   }
@@ -211,10 +220,12 @@ export class Driftwave {
   }
 
   _pickMelodyDegree() {
-    // Bias toward stepwise motion around the current degree.
-    if (this._lastDegree == null) this._lastDegree = 4;
+    // Bias toward stepwise motion, kept within ~two octaves of the *current*
+    // scale (rather than a hard-coded ceiling that meant different ranges for
+    // 5-note vs 7-note scales).
+    const span = SCALES[this.params.scaleName].length * 2 - 1;
     const move = [-2, -1, -1, 0, 1, 1, 2][Math.floor(Math.random() * 7)];
-    this._lastDegree = Math.max(0, Math.min(13, this._lastDegree + move));
+    this._lastDegree = Math.max(0, Math.min(span, this._lastDegree + move));
     return this._lastDegree;
   }
 
@@ -229,10 +240,14 @@ export class Driftwave {
   }
 
   async start() {
-    this._ensureGraph();
-    if (this.ctx.state === 'suspended') await this.ctx.resume();
+    // Claim the running flag synchronously *before* the await, so a rapid
+    // double-click can't slip a second caller past the guard and leak a second
+    // setInterval timer.
     if (this.running) return;
     this.running = true;
+    this._ensureGraph();
+    if (this.ctx.state === 'suspended') await this.ctx.resume();
+    if (!this.running) return; // stopped while we were awaiting resume
     this._step = 0;
     this._nextNoteTime = this.ctx.currentTime + 0.1;
     this._timer = setInterval(() => this._tick(), this._interval);

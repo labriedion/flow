@@ -111,7 +111,9 @@ function draw() {
     ctx.beginPath();
     const slice = w / wave.length;
     for (let i = 0; i < wave.length; i++) {
-      const y = (wave[i] / 255) * h;
+      // Byte data is centered on 128 (silence); map it symmetrically around the
+      // vertical middle so the trace is centered and leaves a little headroom.
+      const y = h / 2 + ((wave[i] - 128) / 128) * (h * 0.45);
       const x = i * slice;
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
