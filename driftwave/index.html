@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Driftwave · generative ambient</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Driftwave</h1>
+      <div class="tagline">generative ambient · never the same twice</div>
+    </header>
+
+    <canvas id="viz"></canvas>
+
+    <div id="transport">
+      <button id="play">▶ Play</button>
+      <span class="foot" id="status">tap play — audio starts on your gesture</span>
+    </div>
+
+    <div id="controls">
+      <div class="ctl">
+        <label>Scale <span class="val" id="scaleName"></span></label>
+        <select id="scale"></select>
+      </div>
+      <div class="ctl">
+        <label>Root <span class="val" id="rootName"></span></label>
+        <select id="root"></select>
+      </div>
+      <div class="ctl">
+        <label>Tempo <span class="val" id="tempoVal"></span></label>
+        <input type="range" id="tempo" min="48" max="120" step="1" />
+      </div>
+      <div class="ctl">
+        <label>Density <span class="val" id="densityVal"></span></label>
+        <input type="range" id="density" min="0.1" max="1" step="0.05" />
+      </div>
+      <div class="ctl">
+        <label>Reverb <span class="val" id="reverbVal"></span></label>
+        <input type="range" id="reverb" min="0" max="0.9" step="0.05" />
+      </div>
+      <div class="ctl">
+        <label>Volume <span class="val" id="volumeVal"></span></label>
+        <input type="range" id="volume" min="0" max="1" step="0.05" />
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
