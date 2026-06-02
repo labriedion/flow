@@ -110,6 +110,17 @@ export class FlowField {
     const ptr = this.pointer;
     const force = pointerForce * this.dpr;
 
+    // Bucket each segment by its color index so we can stroke all same-colored
+    // segments in one path. With additive ('lighter') blending the draw order
+    // doesn't matter, so this is purely a performance win — it collapses up to
+    // thousands of stroke() calls into at most `ramp.length` of them.
+    if (!this._buckets) {
+      this._buckets = Array.from({ length: this.ramp.length }, () => []);
+    }
+    const buckets = this._buckets;
+    for (let b = 0; b < buckets.length; b++) buckets[b].length = 0;
+    const maxIdx = this.ramp.length - 1;
+
     for (let i = 0; i < this.particles.length; i++) {
       const p = this.particles[i];
       const px = p.x, py = p.y;
@@ -140,12 +151,8 @@ export class FlowField {
 
       // Color by heading so the field's structure reads as hue.
       const ci = (((angle % TAU) + TAU) % TAU) / TAU;
-      ctx.strokeStyle = this.ramp[(ci * 255) | 0];
-
-      ctx.beginPath();
-      ctx.moveTo(px, py);
-      ctx.lineTo(nx, ny);
-      ctx.stroke();
+      const idx = Math.min((ci * this.ramp.length) | 0, maxIdx);
+      buckets[idx].push(px, py, nx, ny);
 
       p.x = nx;
       p.y = ny;
@@ -158,6 +165,19 @@ export class FlowField {
       ) {
         this.spawnParticle(p);
       }
+    }
+
+    // Flush each color bucket as a single stroked path.
+    for (let b = 0; b < buckets.length; b++) {
+      const seg = buckets[b];
+      if (seg.length === 0) continue;
+      ctx.strokeStyle = this.ramp[b];
+      ctx.beginPath();
+      for (let s = 0; s < seg.length; s += 4) {
+        ctx.moveTo(seg[s], seg[s + 1]);
+        ctx.lineTo(seg[s + 2], seg[s + 3]);
+      }
+      ctx.stroke();
     }
 
     this.z += params.timeWarp;
