@@ -49,6 +49,18 @@ python -m pytest markov/ -q
 ```
 
 The suite's core guarantee is **soundness**: every `(context → next token)`
-step the generator emits was a transition actually seen in training. It also
-checks seeded determinism, the weighted distribution, both tokenization modes,
+step the generator emits was a transition actually seen in training — verified
+on cyclic corpora where it holds throughout. It also checks seeded determinism,
+the weighted distribution (within a tolerance band), both tokenization modes,
 and graceful handling of corpora too small for the requested order.
+
+### One caveat: restart seams
+
+To always reach the requested length, generation **restarts** from a random
+start state whenever it hits a dead end (a context with no learned successor).
+That restart splices in a fresh state, creating a single "seam" transition the
+model never learned. So soundness holds for every step *except across restart
+seams* — a deliberate trade-off favouring full-length output. This behavior is
+documented in `generate()` and covered by dedicated tests
+(`test_restart_reaches_full_length_on_acyclic_corpus`,
+`test_restart_can_introduce_an_unlearned_seam`).

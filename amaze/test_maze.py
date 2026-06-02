@@ -5,6 +5,8 @@ These verify the structural guarantees we care about: every cell is reachable
 generation is reproducible under a fixed seed.
 """
 
+import pytest
+
 from .maze import (
     Maze, N, S, E, W, DX, DY, OPPOSITE,
     generate_backtracker, generate_prim, GENERATORS,
@@ -45,15 +47,26 @@ def _path_valid(maze: Maze, path) -> bool:
     return True
 
 
-import pytest
+def _edge_count(maze: Maze) -> int:
+    """Number of open passages. Each passage sets a bit on both cells it joins,
+    so the total bit count is twice the number of edges."""
+    bits = sum(
+        bin(maze.cells[y][x]).count("1")
+        for y in range(maze.height)
+        for x in range(maze.width)
+    )
+    return bits // 2
 
 
 @pytest.mark.parametrize("gen", list(GENERATORS.values()))
 @pytest.mark.parametrize("size", [(1, 1), (2, 3), (10, 10), (20, 8)])
-def test_perfect_maze_every_cell_reachable(gen, size):
+def test_perfect_maze_is_a_spanning_tree(gen, size):
+    # A perfect maze is a spanning tree: connected AND acyclic. Connectivity is
+    # |reachable| == cells; the tree (no-loops) property is edges == cells - 1.
     w, h = size
     maze = gen(w, h, seed=123)
     assert _count_reachable(maze) == w * h
+    assert _edge_count(maze) == w * h - 1
 
 
 @pytest.mark.parametrize("gen", list(GENERATORS.values()))
@@ -80,6 +93,17 @@ def test_solvers_find_valid_paths(gen):
     assert bfs[0] == start and bfs[-1] == goal
     assert _path_valid(maze, bfs)
     assert _path_valid(maze, astar)
+
+
+def test_solvers_honor_custom_start_and_goal():
+    maze = generate_backtracker(12, 9, seed=4)
+    start, goal = (3, 2), (9, 7)
+    for solver in (solve_bfs, solve_astar):
+        path = solver(maze, start, goal)
+        assert path and path[0] == start and path[-1] == goal
+        assert _path_valid(maze, path)
+    # Both remain optimal for the custom endpoints.
+    assert len(solve_bfs(maze, start, goal)) == len(solve_astar(maze, start, goal))
 
 
 @pytest.mark.parametrize("gen", list(GENERATORS.values()))
@@ -115,6 +139,16 @@ def test_braid_keeps_maze_connected_and_symmetric(gen):
     braid(maze, fraction=0.5, seed=8)
     assert _count_reachable(maze) == 20 * 14
     assert _passages_symmetric(maze)
+
+
+def test_corridor_braid_cannot_remove_endpoint_dead_ends():
+    # A 1xN maze is a straight corridor; its two ends have no in-bounds wall to
+    # carve through, so full braiding legitimately leaves exactly those 2 dead
+    # ends. This documents the limit of the "full braid removes all" invariant.
+    maze = generate_backtracker(6, 1, seed=1)
+    braid(maze, fraction=1.0, seed=1)
+    assert len(dead_ends(maze)) == 2
+    assert _count_reachable(maze) == 6  # still fully connected
 
 
 def test_partial_braid_reduces_but_keeps_some_dead_ends():

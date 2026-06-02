@@ -35,14 +35,27 @@ def read_input(files: list[str]) -> str:
         return sys.stdin.read()
     parts = []
     for path in files:
-        with open(path, "r", encoding="utf-8") as fh:
+        # Replace undecodable bytes rather than crashing on non-UTF-8 corpora.
+        with open(path, "r", encoding="utf-8", errors="replace") as fh:
             parts.append(fh.read())
     return "\n".join(parts)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    text = read_input(args.files)
+    if args.order < 1:
+        print("--order must be >= 1", file=sys.stderr)
+        return 2
+    if args.length < 1:
+        print("--length must be >= 1", file=sys.stderr)
+        return 2
+
+    try:
+        text = read_input(args.files)
+    except OSError as e:
+        print(f"cannot read input: {e}", file=sys.stderr)
+        return 2
+
     if not text.strip():
         print("no training text provided", file=sys.stderr)
         return 2

@@ -97,10 +97,33 @@ def test_tokenize_modes():
 
 
 def test_weighted_choice_respects_distribution():
-    # "a a a b" trains state ('a',) -> mostly 'a'. Over many draws 'a' dominates.
+    # State ('a',) -> {'a': 8, 'b': 1}, so the next token should be 'a' about
+    # 8/9 ≈ 89% of the time. Assert it lands within a tolerance band, which is a
+    # far stronger check than "a beats b".
     chain = MarkovChain(order=1).train("a a a a a a a a b")
-    counts = {"a": 0, "b": 0}
-    for s in range(400):
-        nxt = chain.generate(length=2, seed=s).split()[1]
-        counts[nxt] = counts.get(nxt, 0) + 1
-    assert counts["a"] > counts["b"]
+    n = 2000
+    a = sum(chain.generate(length=2, seed=s).split()[1] == "a" for s in range(n))
+    ratio = a / n
+    assert 0.84 < ratio < 0.94, ratio
+
+
+# ---- Restart / seam behavior (the one place soundness does not hold) --------
+
+def test_restart_reaches_full_length_on_acyclic_corpus():
+    # A linear corpus dead-ends at its final state; reaching a length longer
+    # than the corpus proves the restart mechanism fired.
+    chain = MarkovChain(order=2).train("a b c d e f g")
+    out = chain.generate(length=40, seed=1).split()
+    assert len(out) == 40
+
+
+def test_restart_can_introduce_an_unlearned_seam():
+    # Documents the deliberate trade-off: on an acyclic corpus the spliced
+    # restart produces at least one transition the model never learned.
+    chain = MarkovChain(order=2).train("a b c d e")
+    out = chain.generate(length=30, seed=1).split()
+    has_seam = any(
+        out[i + 2] not in chain.transitions.get(tuple(out[i:i + 2]), {})
+        for i in range(len(out) - 2)
+    )
+    assert has_seam

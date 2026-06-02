@@ -10,12 +10,14 @@ const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d');
 const fractal = new Fractal();
 
-const FULL_CAP = 1100;   // max width (CSS px) for the crisp pass
+const FULL_CAP = 2000;   // max width (CSS px) for the crisp pass — high enough
+                         // that typical displays render 1:1 (no upscale blur)
 const PREVIEW_DIV = 3;   // preview renders at 1/3 the linear resolution
 const ANIM_CAP = 640;    // cap during color cycling to keep it smooth
 
 const buffer = document.createElement('canvas');
 const bctx = buffer.getContext('2d');
+let imgCache = null;     // reused ImageData, reallocated only when dims change
 
 let cssW = 0, cssH = 0;
 
@@ -36,10 +38,13 @@ function renderAt(targetW) {
   if (buffer.width !== rw || buffer.height !== rh) {
     buffer.width = rw;
     buffer.height = rh;
+    imgCache = null; // dims changed — drop the stale buffer
   }
-  const img = bctx.createImageData(rw, rh);
-  fractal.render(img, rw, rh);
-  bctx.putImageData(img, 0, 0);
+  if (!imgCache || imgCache.width !== rw || imgCache.height !== rh) {
+    imgCache = bctx.createImageData(rw, rh);
+  }
+  fractal.render(imgCache, rw, rh);
+  bctx.putImageData(imgCache, 0, 0);
 
   ctx.imageSmoothingEnabled = rw < cssW; // smooth only when upscaling a preview
   ctx.drawImage(buffer, 0, 0, rw, rh, 0, 0, cssW, cssH);
@@ -62,7 +67,9 @@ function scheduleFull() {
 // ---- Readout ------------------------------------------------------------
 const readout = document.getElementById('readout');
 function updateReadout() {
-  const zoom = (1.4 / fractal.view.scale);
+  // Zoom is relative to the mode's default (reset) scale.
+  const base = fractal.mode === 'julia' ? 1.6 : 1.4;
+  const zoom = (base / fractal.view.scale);
   const zoomStr = zoom >= 1000
     ? zoom.toExponential(2)
     : zoom.toFixed(zoom < 10 ? 2 : 0);
@@ -177,7 +184,10 @@ canvas.addEventListener('mousedown', (e) => {
 
 window.addEventListener('mousemove', (e) => {
   // Julia morph: hold Shift and move to set the constant from the cursor.
-  if (fractal.mode === 'julia' && e.shiftKey && !dragging) {
+  // Skip when the cursor is over the control panel so hovering the UI (while
+  // not dragging) doesn't morph c.
+  if (fractal.mode === 'julia' && e.shiftKey && !dragging &&
+      !(e.target.closest && e.target.closest('#panel'))) {
     const c = fractal.pixelToComplex(e.clientX, e.clientY, cssW, cssH);
     fractal.juliaC = { x: c.re, y: c.im };
     renderPreview();
@@ -217,9 +227,10 @@ canvas.addEventListener('dblclick', (e) => {
   renderFull();
 });
 
+let resizeTimer = null;
 window.addEventListener('resize', () => {
-  clearTimeout(fullTimer);
-  fullTimer = setTimeout(fitCanvas, 120);
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(fitCanvas, 120);
 });
 
 fitCanvas();

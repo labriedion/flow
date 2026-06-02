@@ -125,7 +125,9 @@ canvas.addEventListener('touchstart', (e) => {
   field.pointer.mode = 1;
   pointerPos(e.touches[0]);
 }, { passive: true });
-canvas.addEventListener('touchmove', (e) => pointerPos(e.touches[0]), { passive: true });
+canvas.addEventListener('touchmove', (e) => {
+  if (field.pointer.active) pointerPos(e.touches[0]);
+}, { passive: true });
 window.addEventListener('touchend', () => { field.pointer.active = false; });
 
 // ---- Keyboard shortcuts -------------------------------------------------
@@ -134,7 +136,9 @@ const togglePanel = document.getElementById('togglePanel');
 togglePanel.addEventListener('click', () => panel.classList.remove('hidden'));
 
 window.addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT') return;
+  // Ignore while typing in a control or when a button is focused, so Space
+  // doesn't both trigger the focused button and our shortcut (double toggle).
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
   switch (e.key.toLowerCase()) {
     case ' ': e.preventDefault(); pauseBtn.click(); break;
     case 'c': field.hardClear(); break;
