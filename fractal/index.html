@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fractal Explorer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <aside id="panel">
+    <h1>Fractal</h1>
+    <div class="sub">mandelbrot · julia explorer</div>
+
+    <div class="modes">
+      <button id="modeMandel" class="active">Mandelbrot</button>
+      <button id="modeJulia">Julia</button>
+    </div>
+
+    <div class="palettes" id="palettes"></div>
+
+    <div class="control">
+      <label>Detail (iterations) <span class="val" id="iterVal"></span></label>
+      <input type="range" id="iter" min="50" max="1500" step="10" />
+    </div>
+    <div class="control">
+      <label>Color Density <span class="val" id="densityVal"></span></label>
+      <input type="range" id="density" min="2" max="40" step="1" />
+    </div>
+    <div class="control">
+      <label>Color Shift <span class="val" id="shiftVal"></span></label>
+      <input type="range" id="shift" min="0" max="1024" step="4" />
+    </div>
+
+    <div class="buttons">
+      <button id="animate">Cycle Colors</button>
+      <button id="reset">Reset View</button>
+      <button id="save" class="wide">Save PNG ⬇</button>
+    </div>
+
+    <div class="readout" id="readout"></div>
+    <div class="readout">
+      <kbd>scroll</kbd> zoom · <kbd>drag</kbd> pan · <kbd>dbl-click</kbd> zoom in.<br />
+      In Julia mode, <kbd>Shift</kbd>+move morphs the constant.
+    </div>
+  </aside>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
