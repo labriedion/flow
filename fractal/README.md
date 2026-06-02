@@ -4,6 +4,12 @@ An interactive Mandelbrot and Julia set explorer that renders in real time —
 zoom, pan, recolor, and cycle through the complex plane. Pure HTML5 Canvas, no
 dependencies, no build. Just open `index.html`.
 
+![A Mandelbrot seahorse-valley spiral rendered with this project's math](examples/mandelbrot.png)
+
+*A zoom into the "seahorse valley" (Inferno palette). This image was rendered
+by a pure-Python port of the same escape-time + smooth-coloring math —
+see [`tools/gen_fractal.py`](../tools/gen_fractal.py).*
+
 ```
 fractal/
   index.html   # UI shell
