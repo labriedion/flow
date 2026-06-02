@@ -40,7 +40,17 @@ A freshly generated maze is *perfect*: exactly one path between any two cells.
 are multiple routes to the goal and the solver gets to pick the genuinely
 shortest one. `--braid 1.0` removes every dead end; partial values (e.g. `0.4`)
 leave some. It only ever adds passages, so the maze always stays fully
-connected.
+connected. (The one exception: a 1×N corridor's two endpoints have no wall to
+carve through, so full braiding leaves exactly those two dead ends.)
+
+## Custom start and goal
+
+By default the solution runs from the top-left cell to the bottom-right. Pass
+`--start X,Y` and/or `--goal X,Y` (0-indexed) to solve between any two cells:
+
+```bash
+python -m amaze.cli -W 20 -H 12 --start 0,0 --goal 19,0 --braid 0.3
+```
 
 ## Use it as a library
 
@@ -58,6 +68,9 @@ print(render(maze, path))
 python -m pytest amaze/ -q
 ```
 
-The suite checks that generated mazes are **perfect** (every cell reachable,
-no loops), that passages are symmetric, that generation is reproducible under
-a seed, and that BFS and A* agree on the (unique) optimal path length.
+The suite checks that generated mazes are **perfect** — proven by asserting
+both connectivity (every cell reachable) *and* the tree property (edges ==
+cells − 1, i.e. no loops). It also verifies passage symmetry, seed
+reproducibility, custom start/goal solving, braid connectivity/dead-end
+removal (including the corridor edge case), and that BFS and A* agree on the
+optimal path length.

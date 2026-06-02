@@ -3,6 +3,7 @@
 Examples:
     python -m amaze.cli --width 30 --height 15
     python -m amaze.cli -W 40 -H 20 --algo prim --solver astar --seed 7
+    python -m amaze.cli -W 20 -H 12 --start 0,0 --goal 19,0 --braid 0.3
     python -m amaze.cli --no-solve --no-color
 """
 
@@ -35,9 +36,26 @@ def build_parser() -> argparse.ArgumentParser:
         "--braid", type=float, default=0.0, metavar="FRACTION",
         help="remove this fraction (0-1) of dead ends, adding loops",
     )
+    p.add_argument(
+        "--start", type=_coord, default=None, metavar="X,Y",
+        help="start cell for the solution (default: 0,0)",
+    )
+    p.add_argument(
+        "--goal", type=_coord, default=None, metavar="X,Y",
+        help="goal cell for the solution (default: bottom-right)",
+    )
     p.add_argument("--no-solve", action="store_true", help="do not overlay a solution")
     p.add_argument("--no-color", action="store_true", help="disable ANSI colors")
     return p
+
+
+def _coord(text: str) -> tuple[int, int]:
+    """Parse an "x,y" coordinate argument."""
+    try:
+        x, y = (int(part) for part in text.split(","))
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"expected X,Y but got {text!r}")
+    return (x, y)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -46,6 +64,13 @@ def main(argv: list[str] | None = None) -> int:
         print("width and height must be >= 1", file=sys.stderr)
         return 2
 
+    start = args.start if args.start is not None else (0, 0)
+    goal = args.goal if args.goal is not None else (args.width - 1, args.height - 1)
+    for label, (cx, cy) in (("start", start), ("goal", goal)):
+        if not (0 <= cx < args.width and 0 <= cy < args.height):
+            print(f"{label} {cx},{cy} is out of bounds", file=sys.stderr)
+            return 2
+
     maze = GENERATORS[args.algo](args.width, args.height, args.seed)
     if args.braid > 0:
         # Offset the seed so the braid pass isn't correlated with generation.
@@ -53,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
 
     path = None
     if not args.no_solve:
-        path = SOLVERS[args.solver](maze)
+        path = SOLVERS[args.solver](maze, start, goal)
 
     print(render(maze, path, color=not args.no_color))
 
