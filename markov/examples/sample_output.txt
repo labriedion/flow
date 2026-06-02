@@ -1,0 +1,18 @@
+# Sample output from markov (trained on the included corpus.txt)
+
+$ python -m markov.cli markov/corpus.txt --order 2 --length 50 --seed 11
+
+It is a truth universally acknowledged, that a single man in possession of a wife. However little known the feelings or views of such a man may be on his first entering a neighbourhood, this truth is so well fixed in the minds of the surrounding families, that he is
+
+$ python -m markov.cli markov/corpus.txt --order 3 --length 50 --seed 4
+
+It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife. However little known the feelings or views of such a man may be on his first entering a neighbourhood, this truth is so well fixed in the
+
+$ python -m markov.cli markov/corpus.txt --char --order 5 --length 220 --seed 2   # invented words
+
+It is a truth is
+so well fixed in the north of England.
+It is a truth is
+so well fixed in the feelings or
+views of the surrounding families, that he is considered
+the rightful property of such a man may be on his lady to

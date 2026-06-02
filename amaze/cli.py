@@ -13,7 +13,7 @@ import argparse
 import sys
 
 from .maze import GENERATORS, SOLVERS, braid, dead_ends
-from .render import render
+from .render import render, to_svg
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -46,6 +46,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--no-solve", action="store_true", help="do not overlay a solution")
     p.add_argument("--no-color", action="store_true", help="disable ANSI colors")
+    p.add_argument(
+        "--svg", action="store_true",
+        help="emit an SVG image (to stdout) instead of terminal art",
+    )
     return p
 
 
@@ -79,6 +83,10 @@ def main(argv: list[str] | None = None) -> int:
     path = None
     if not args.no_solve:
         path = SOLVERS[args.solver](maze, start, goal)
+
+    if args.svg:
+        print(to_svg(maze, path))
+        return 0
 
     print(render(maze, path, color=not args.no_color))
 

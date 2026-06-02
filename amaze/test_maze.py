@@ -7,11 +7,14 @@ generation is reproducible under a fixed seed.
 
 import pytest
 
+import xml.dom.minidom
+
 from .maze import (
     Maze, N, S, E, W, DX, DY, OPPOSITE,
     generate_backtracker, generate_prim, GENERATORS,
     solve_bfs, solve_astar, braid, dead_ends,
 )
+from .render import to_svg
 
 
 def _count_reachable(maze: Maze, start=(0, 0)) -> int:
@@ -123,6 +126,19 @@ def test_carve_out_of_bounds_raises():
 def test_trivial_single_cell():
     maze = generate_prim(1, 1, seed=1)
     assert solve_bfs(maze) == [(0, 0)]
+
+
+def test_to_svg_is_well_formed_and_includes_solution():
+    maze = generate_backtracker(8, 6, seed=3)
+    path = solve_bfs(maze)
+    svg = to_svg(maze, path)
+    doc = xml.dom.minidom.parseString(svg)  # raises if malformed
+    assert doc.documentElement.tagName == "svg"
+    assert len(doc.getElementsByTagName("polyline")) == 1   # the solution
+    assert len(doc.getElementsByTagName("circle")) == 2     # start + goal
+    # Without a path there should be no overlay.
+    bare = xml.dom.minidom.parseString(to_svg(maze))
+    assert len(bare.getElementsByTagName("polyline")) == 0
 
 
 @pytest.mark.parametrize("gen", list(GENERATORS.values()))

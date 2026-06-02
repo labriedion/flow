@@ -7,6 +7,12 @@ field paints itself in light.
 
 **Zero dependencies, zero build step.** Just open `index.html` in a browser.
 
+![A flow field rendered by this engine](examples/flowfield.png)
+
+*A frame from the engine (Aurora palette). This exact image was produced by a
+pure-Python port of the same simplex-noise + additive-trail algorithm —
+see [`tools/gen_flowfield.py`](../tools/gen_flowfield.py).*
+
 ```
 flowfield/
   index.html    # UI shell

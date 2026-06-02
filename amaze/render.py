@@ -80,3 +80,70 @@ def render(maze: Maze, path: list[tuple[int, int]] | None = None,
                 line.append(ch)
         out_lines.append("".join(line))
     return "\n".join(out_lines)
+
+
+def to_svg(maze: Maze, path: list[tuple[int, int]] | None = None,
+           cell: int = 22, margin: int = 12) -> str:
+    """Render the maze as a standalone SVG string.
+
+    Walls are drawn as a single dark stroked path; an optional solution is
+    overlaid as a smooth colored polyline with start/goal markers. SVG is
+    crisp at any zoom and renders inline on GitHub, which makes it a nice
+    artifact for a README.
+    """
+    w, h = maze.width, maze.height
+    width = w * cell + 2 * margin
+    height = h * cell + 2 * margin
+
+    def gx(cx):
+        return margin + cx * cell
+
+    def gy(cy):
+        return margin + cy * cell
+
+    # Build the wall geometry. For each cell, draw the walls on the sides that
+    # have no open passage; the outer border falls out of the same checks.
+    segs = []
+    for y in range(h):
+        for x in range(w):
+            x0, y0 = gx(x), gy(y)
+            x1, y1 = gx(x + 1), gy(y + 1)
+            if not maze.linked(x, y, N):
+                segs.append(f"M{x0} {y0}H{x1}")
+            if not maze.linked(x, y, W):
+                segs.append(f"M{x0} {y0}V{y1}")
+            if x == w - 1 and not maze.linked(x, y, E):
+                segs.append(f"M{x1} {y0}V{y1}")
+            if y == h - 1 and not maze.linked(x, y, S):
+                segs.append(f"M{x0} {y1}H{x1}")
+    walls = "".join(segs)
+
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" '
+        f'height="{height}" viewBox="0 0 {width} {height}">',
+        f'<rect width="{width}" height="{height}" fill="#0d1017"/>',
+        f'<path d="{walls}" fill="none" stroke="#5b6478" '
+        f'stroke-width="2" stroke-linecap="square"/>',
+    ]
+
+    if path:
+        pts = " ".join(f"{gx(x) + cell / 2:.1f},{gy(y) + cell / 2:.1f}" for x, y in path)
+        parts.append(
+            f'<polyline points="{pts}" fill="none" stroke="#21d4fd" '
+            f'stroke-width="{max(2, cell // 6)}" stroke-linejoin="round" '
+            f'stroke-linecap="round" opacity="0.9"/>'
+        )
+        sx, sy = path[0]
+        gx_, gy_ = path[-1]
+        r = cell * 0.28
+        parts.append(
+            f'<circle cx="{gx(sx) + cell / 2:.1f}" cy="{gy(sy) + cell / 2:.1f}" '
+            f'r="{r:.1f}" fill="#2ecc71"/>'
+        )
+        parts.append(
+            f'<circle cx="{gx(gx_) + cell / 2:.1f}" cy="{gy(gy_) + cell / 2:.1f}" '
+            f'r="{r:.1f}" fill="#ff4fa3"/>'
+        )
+
+    parts.append("</svg>")
+    return "\n".join(parts)
