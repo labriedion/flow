@@ -11,7 +11,7 @@ from .maze import (
     braid,
     dead_ends,
 )
-from .render import render
+from .render import render, to_svg
 
 __all__ = [
     "Maze",
@@ -24,4 +24,5 @@ __all__ = [
     "braid",
     "dead_ends",
     "render",
+    "to_svg",
 ]

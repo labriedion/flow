@@ -3,6 +3,13 @@
 A tiny, dependency-free maze **generator** and **solver** for your terminal.
 Pure Python standard library, with a real test suite.
 
+![A generated maze with its solution](examples/maze.svg)
+
+*A 27×16 maze with the A\* solution overlaid (green = start, pink = goal). The
+SVG is produced by the tool itself — `python -m amaze.cli -W 27 -H 16 --seed 7
+--solver astar --svg > maze.svg`. A braided variant with loops lives at
+[`examples/maze-braided.svg`](examples/maze-braided.svg).*
+
 ```
 amaze/
   maze.py        # grid model, generation algorithms, pathfinding solvers
