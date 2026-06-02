@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flow Field Studio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <aside id="panel">
+    <h1>Flow Field</h1>
+    <div class="sub">a generative drift studio</div>
+
+    <div class="palettes" id="palettes"></div>
+
+    <div class="control">
+      <label>Particles <span class="val" id="countVal"></span></label>
+      <input type="range" id="count" min="100" max="6000" step="50" />
+    </div>
+    <div class="control">
+      <label>Speed <span class="val" id="speedVal"></span></label>
+      <input type="range" id="speed" min="0.2" max="5" step="0.1" />
+    </div>
+    <div class="control">
+      <label>Noise Scale <span class="val" id="noiseScaleVal"></span></label>
+      <input type="range" id="noiseScale" min="0.0004" max="0.006" step="0.0001" />
+    </div>
+    <div class="control">
+      <label>Curl <span class="val" id="curlVal"></span></label>
+      <input type="range" id="curl" min="0.5" max="6" step="0.1" />
+    </div>
+    <div class="control">
+      <label>Time Warp <span class="val" id="timeWarpVal"></span></label>
+      <input type="range" id="timeWarp" min="0" max="0.004" step="0.0001" />
+    </div>
+    <div class="control">
+      <label>Trail Length <span class="val" id="fadeVal"></span></label>
+      <input type="range" id="fade" min="0.005" max="0.25" step="0.005" />
+    </div>
+    <div class="control">
+      <label>Line Width <span class="val" id="lineWidthVal"></span></label>
+      <input type="range" id="lineWidth" min="0.4" max="3" step="0.1" />
+    </div>
+
+    <div class="buttons">
+      <button id="pause">Pause</button>
+      <button id="clear">Clear</button>
+      <button id="reseed">Reseed</button>
+      <button id="random">Surprise</button>
+      <button id="save" class="wide">Save PNG ⬇</button>
+    </div>
+
+    <div class="hint">
+      Hold <kbd>left-click</kbd> to attract · <kbd>right-click</kbd> to repel.<br />
+      <kbd>Space</kbd> pause · <kbd>C</kbd> clear · <kbd>R</kbd> reseed ·
+      <kbd>S</kbd> save · <kbd>H</kbd> hide panel.
+    </div>
+  </aside>
+  <button id="togglePanel" title="Show controls">☰</button>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
