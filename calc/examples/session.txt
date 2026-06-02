@@ -1,0 +1,29 @@
+# An example calc REPL session (» is the prompt)
+
+calc — arithmetic REPL. Type an expression, ':help', or ':quit'.
+» 2 + 3 * 4
+14
+» (2 + 3) * 4
+20
+» 2 ^ 3 ^ 2            # right-associative: 2^(3^2)
+512
+» -2 ^ 2              # unary minus binds looser than ^
+-4
+» sqrt(2) ^ 2
+2
+» radius = 5
+5
+» area = pi * radius ^ 2
+78.53981634
+» max(3, 7, 1) + min(-2, 4)
+5
+» log(1024, 2)
+10
+» 1 / 0
+error: division by zero
+» (-8) ^ 0.5          # fractional power of a negative -> clean error, no crash
+error: result is complex (fractional power of a negative number)
+» :vars
+  radius = 5
+  area = 78.53981634
+» :quit
