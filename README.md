@@ -12,7 +12,8 @@ exploration of what's fun to make.
 | [**amaze**](./amaze) | A terminal maze generator & solver. Perfect or braided mazes via recursive backtracker or Prim's; optimal paths via BFS or A*; Unicode rendering with a colored solution overlay. 24 passing tests. | Python (stdlib only) |
 | [**driftwave**](./driftwave) | A generative ambient music engine — evolving detuned pads and probabilistic plucks over a synthesized reverb, with stereo width, a limiter, and a live visualizer. Never the same twice. | Web Audio API · vanilla JS |
 | [**fractal**](./fractal) | An interactive Mandelbrot & Julia explorer — smooth-colored, real-time zoom/pan, live Julia morphing, animated palette cycling, PNG export. | HTML5 Canvas · vanilla JS |
-| [**markov**](./markov) | A Markov-chain text generator. Train on any corpus and babble in its style, by word or by character. CLI + library, 12 passing tests. | Python (stdlib only) |
+| [**markov**](./markov) | A Markov-chain text generator. Train on any corpus and babble in its style, by word or by character. CLI + library, 14 passing tests. | Python (stdlib only) |
+| [**calc**](./calc) | An arithmetic expression evaluator — a full tokenizer → parser → evaluator with operator precedence, functions, constants, and variables. REPL + library, 50 passing tests. | Python (stdlib only) |
 
 ## Running them
 
@@ -22,5 +23,7 @@ exploration of what's fun to make.
   `python -m pytest amaze/ -q`).
 - **markov** — `python -m markov.cli markov/corpus.txt --order 2 --length 60`
   (run tests with `python -m pytest markov/ -q`).
+- **calc** — `python -m calc.cli "2 + 3 * 4"` or just `python -m calc.cli` for
+  the REPL (run tests with `python -m pytest calc/ -q`).
 
 Each project has its own README with full details.
