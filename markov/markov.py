@@ -23,8 +23,11 @@ def tokenize(text: str, mode: str) -> list[str]:
     if mode == "char":
         return list(text)
     if mode == "word":
+        stripped = text.strip()
+        if not stripped:
+            return []  # avoid re.split returning ['']
         # Collapse runs of whitespace; keep everything else as-is.
-        return re.split(r"\s+", text.strip())
+        return re.split(r"\s+", stripped)
     raise ValueError(f"unknown mode: {mode!r} (use 'word' or 'char')")
 
 
@@ -72,7 +75,16 @@ class MarkovChain:
     def generate(self, length: int = 100, seed: int | None = None) -> str:
         """Generate up to `length` tokens. When the chain hits a dead-end state
         (one with no recorded successors) it restarts from a random start state,
-        so generation never gets stuck.
+        so generation always reaches the requested length instead of stopping
+        short.
+
+        Soundness note: every token produced by *following the chain* is a
+        transition that appeared in training. A restart, however, splices a
+        fresh start state onto the output, which introduces one "seam"
+        transition at the join that the model never learned. So soundness holds
+        for every step except across restart seams — a deliberate trade-off
+        favouring full-length output. Corpora with no dead-end states (e.g.
+        cyclic text) never restart and are therefore sound throughout.
         """
         if not self.transitions:
             raise ValueError("model is empty — train it first")
