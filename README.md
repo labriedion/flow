@@ -13,6 +13,7 @@ Here's what's in the box so far:
 | [**markov**](./markov) | Feed it any text and it babbles back in the same style, word-by-word or letter-by-letter. Good for fake prose and invented words. | Python (stdlib) |
 | [**calc**](./calc) | A proper little expression evaluator — tokenizer, parser, the works — with functions, constants and variables. Comes with a REPL. | Python (stdlib) |
 | [**reggie**](./reggie) | A regex engine built from scratch — pattern to bytecode to a virtual machine that matches in linear time and never catastrophically backtracks. Captures and all. | Python (stdlib) |
+| [**cellular**](./cellular) | Wolfram's one-dimensional cellular automata. Feed it a rule number from 0–255 and watch Sierpinski triangles and pure chaos fall out. Terminal art or SVG. | Python (stdlib) |
 
 ## Running them
 
@@ -26,3 +27,5 @@ Here's what's in the box so far:
   the REPL (tests: `python -m pytest calc/ -q`)
 - **reggie** — `python -m reggie.cli '\d+' "order 66 ships 1024"`
   (tests: `python -m pytest reggie/ -q`)
+- **cellular** — `python -m cellular.cli --rule 30`, or `--rule 90` for a
+  Sierpinski triangle (tests: `python -m pytest cellular/ -q`)
