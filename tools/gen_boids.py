@@ -67,8 +67,9 @@ def simulate():
         boids.append([rng.random() * W, rng.random() * H,
                       math.cos(a) * sp, math.sin(a) * sp])
     tails = [[] for _ in range(COUNT)]
-    cell = PERCEPTION
+    cell = max(PERCEPTION, SEPARATION)        # grid covers the larger radius
     perc2, sep2 = PERCEPTION ** 2, SEPARATION ** 2
+    max2 = max(perc2, sep2)
 
     for step in range(STEPS):
         # Spatial hash so neighbour search is near O(n).
@@ -89,11 +90,12 @@ def simulate():
                         o = boids[j]
                         dx, dy = o[0] - me[0], o[1] - me[1]
                         d2 = dx * dx + dy * dy
-                        if d2 > perc2 or d2 == 0:
+                        if d2 > max2 or d2 == 0:
                             continue
-                        ax += o[2]; ay += o[3]; an += 1
-                        cxs += o[0]; cys += o[1]; cn += 1
-                        if d2 < sep2:
+                        if d2 < perc2:        # alignment + cohesion
+                            ax += o[2]; ay += o[3]; an += 1
+                            cxs += o[0]; cys += o[1]; cn += 1
+                        if d2 < sep2:          # separation (own radius)
                             d = math.sqrt(d2)
                             sx -= dx / d / d
                             sy -= dy / d / d
@@ -109,6 +111,11 @@ def simulate():
                 fx += s[0] * SEP_W; fy += s[1] * SEP_W
             me[2] += fx; me[3] += fy
             me[2], me[3] = limit(me[2], me[3], MAX_SPEED)
+            # Match boids.js: keep a small minimum speed so nobody stalls.
+            sp = math.hypot(me[2], me[3])
+            if 0 < sp < MAX_SPEED * 0.25:
+                t = (MAX_SPEED * 0.25) / sp
+                me[2] *= t; me[3] *= t
 
         for i, me in enumerate(boids):
             me[0] = (me[0] + me[2]) % W

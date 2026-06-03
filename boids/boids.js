@@ -101,9 +101,11 @@ export class Flock {
   _key(cx, cy) { return cx * 73856093 ^ cy * 19349663; }
 
   _buildGrid() {
-    // Cell size tracks the largest interaction radius so each boid only needs to
-    // scan its own cell and the eight around it.
-    this.cellSize = Math.max(8, this.params.perception) * this.dpr;
+    // Cell size tracks the largest interaction radius — perception *or* personal
+    // space, whichever is bigger — so the 3x3 neighbour scan can never miss a
+    // boid that one of the rules cares about.
+    const radius = Math.max(this.params.perception, this.params.separation);
+    this.cellSize = Math.max(8, radius) * this.dpr;
     const grid = this.grid;
     grid.clear();
     const inv = 1 / this.cellSize;
@@ -128,6 +130,7 @@ export class Flock {
     const sep = p.separation * this.dpr;
     const perc2 = perc * perc;
     const sep2 = sep * sep;
+    const max2 = Math.max(perc2, sep2);   // cull radius covering both rules
     const maxSpeed = this.scaledSpeed;
     const maxForce = p.maxForce * this.dpr;
 
@@ -151,11 +154,15 @@ export class Flock {
             const dx = other.x - me.x;
             const dy = other.y - me.y;
             const d2 = dx * dx + dy * dy;
-            if (d2 > perc2 || d2 === 0) continue;
-            alignX += other.vx; alignY += other.vy; alignN++;
-            cohX += other.x; cohY += other.y; cohN++;
+            if (d2 > max2 || d2 === 0) continue;
+            // Alignment and cohesion look out to the perception radius...
+            if (d2 < perc2) {
+              alignX += other.vx; alignY += other.vy; alignN++;
+              cohX += other.x; cohY += other.y; cohN++;
+            }
+            // ...separation acts within its own (independent) personal-space
+            // radius, weighted by closeness (1/distance).
             if (d2 < sep2) {
-              // Push away, weighted by closeness (1/distance).
               const d = Math.sqrt(d2);
               sepX -= dx / d / d;
               sepY -= dy / d / d;
