@@ -73,7 +73,9 @@ printf 'the cat sat\non the mat\n' | python -m reggie.cli 'at'
 ```
 
 It exits `0` if anything matched and `1` if not, so it composes in shell
-pipelines.
+pipelines. Like `grep`, the CLI searches each input line independently, so `^`
+and `$` anchor to the start and end of a *line* there. (In the library, where
+there are no lines, they anchor to the whole string — see below.)
 
 ## Use it as a library
 
@@ -108,7 +110,9 @@ rx.search("aXbYb").span()            # (0, 3)  — lazy quantifier
 | `^` `$` | anchors: start / end of the string |
 
 `^` and `$` anchor to the start and end of the whole string (there's no
-multiline mode), which keeps their meaning simple and predictable.
+multiline mode), which keeps their meaning simple and predictable. The `\d \w
+\s` shorthands use Python's own Unicode-aware character tests, so `\d` matches
+any Unicode digit and `\w` any Unicode letter/digit/underscore — not just ASCII.
 
 ## Test it
 

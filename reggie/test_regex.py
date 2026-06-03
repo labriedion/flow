@@ -47,6 +47,15 @@ def test_fullmatch_requires_whole_string():
     assert reggie.fullmatch("a+", "aaab") is None
 
 
+def test_fullmatch_explores_non_greedy_branch_to_reach_end():
+    # The greedy-preferred branch `a` matches at the start, but only `ab` spans
+    # the whole string — fullmatch must find it (cf. re.fullmatch).
+    assert reggie.fullmatch("a|ab", "ab").span() == (0, 2)
+    assert reggie.fullmatch("a|ab|abc", "abc").span() == (0, 3)
+    m = reggie.fullmatch("(a|ab)(c|bcd)", "abcd")
+    assert m.groups() == ("a", "bcd")
+
+
 def test_match_is_anchored_at_start_only():
     assert reggie.match("a+", "aaab").span() == (0, 3)
     assert reggie.match("a+", "baaa") is None
@@ -287,6 +296,24 @@ def test_differential_against_re():
             assert (a is None) == (b is None), (pat, text, pos)
             if a is not None:
                 assert a.span() == b.span(), (pat, text, pos, a.span(), b.span())
+        # fullmatch has different winner-selection than match (the end anchor
+        # can make a lower-priority branch win), so cross-check it directly.
+        fa = mine.fullmatch(text)
+        fb = theirs.fullmatch(text)
+        assert (fa is None) == (fb is None), (pat, text, "fullmatch")
+        if fa is not None:
+            assert fa.span() == fb.span(), (pat, text, "fullmatch", fa.span(), fb.span())
+        # Unanchored search: span and capture groups must match re exactly.
+        sa = mine.search(text)
+        sb = theirs.search(text)
+        assert (sa is None) == (sb is None), (pat, text, "search")
+        if sa is not None:
+            assert sa.span() == sb.span(), (pat, text, "search", sa.span(), sb.span())
+            assert sa.groups() == sb.groups(), (pat, text, "search groups")
+        # The full sequence of finditer spans, *including zero-width matches*,
+        # must match re's — this pins down the empty-match stepping rule.
+        assert [m.span() for m in mine.finditer(text)] == \
+               [m.span() for m in theirs.finditer(text)], (pat, text, "finditer")
         checked += 1
     assert checked > 2000   # make sure the generator actually exercised things
 
@@ -306,8 +333,11 @@ def test_no_catastrophic_backtracking():
     assert elapsed < 1.0, f"matching took {elapsed:.2f}s — backtracking?"
 
 
-def test_scales_linearly_with_text():
-    pat = reggie.compile("(a|aa)*b")
+def test_search_scales_linearly_with_text():
+    # A non-matching pattern is the worst case for unanchored search: a naive
+    # restart-at-every-offset search would be O(n^2). The implicit-prefix VM
+    # search is a single linear pass, so doubling the text ~doubles the time.
+    pat = reggie.compile("z")
 
     def timed(n: int) -> float:
         text = "a" * n
@@ -315,7 +345,25 @@ def test_scales_linearly_with_text():
         pat.search(text)
         return time.perf_counter() - start
 
-    # Doubling the input should roughly double the work, not square it.
-    t_small = timed(400) + 1e-6
-    t_big = timed(800)
-    assert t_big < t_small * 8     # generous slack for timer noise
+    base = timed(4000)
+    for n in (8000, 16000):
+        base = timed(2000)  # warm reference each step to dampen timer noise
+    t1 = min(timed(4000) for _ in range(3)) + 1e-6
+    t2 = min(timed(8000) for _ in range(3))
+    # Linear would be ~2x; quadratic would be ~4x. Assert well under quadratic.
+    assert t2 < t1 * 3.0, f"search looks super-linear: {t1:.4f}s -> {t2:.4f}s"
+
+
+def test_huge_repetition_counts_are_rejected_fast():
+    # Every way of asking for an enormous expansion must raise cleanly rather
+    # than hang: a giant minimum, a giant maximum, and the product of nested
+    # repeats (which no single per-node limit would catch).
+    start = time.perf_counter()
+    for pat in ("a{2000000,}", "a{0,2000000}", "a{50000,50000}{50000,50000}"):
+        with pytest.raises(RegexError):
+            reggie.compile(pat)
+    # The point is that it doesn't *hang* (the un-capped versions ran for many
+    # seconds / effectively forever); a generous budget still proves that.
+    assert time.perf_counter() - start < 2.0
+    # A merely large-but-reasonable pattern still compiles and works.
+    assert reggie.fullmatch("a{500}", "a" * 500) is not None

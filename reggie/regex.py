@@ -1,4 +1,4 @@
-"""A small regular-expression engine: parser -> bytecode -> Pike VM.
+r"""A small regular-expression engine: parser -> bytecode -> Pike VM.
 
 The interesting property is *how* it matches. Most backtracking engines (including
 Python's `re`) can blow up to exponential time on adversarial patterns like
@@ -325,6 +325,11 @@ class IChar:
 class IAny:
     pass
 @dataclass
+class IAnyByte:
+    """Consume any single character, newline included. Used only by the implicit
+    prefix that turns the program into a linear-time unanchored search."""
+    pass
+@dataclass
 class IClass:
     negated: bool
     members: list
@@ -346,9 +351,13 @@ class IAssert:
     where: str    # "start" or "end"
 
 
-# The largest expansion we'll allow for bounded repetition, to keep a pattern
-# like `a{1,100000}{1,100000}` from generating an enormous program.
-_MAX_REPEAT_EXPANSION = 100_000
+# Bounded repetition is implemented by expanding copies, so the program size is
+# what actually has to stay sane. We cap the total instruction count rather than
+# any single repeat: that one guard catches every way a pattern can blow up the
+# program — a giant minimum (`a{2000000,}`), a giant maximum, and crucially the
+# *product* of nested repeats (`a{50000,50000}{50000,50000}`), which no per-node
+# limit would catch.
+_MAX_PROGRAM_SIZE = 200_000
 
 
 class _Compiler:
@@ -356,13 +365,22 @@ class _Compiler:
         self.prog: list = []
 
     def emit(self, inst) -> int:
+        if len(self.prog) >= _MAX_PROGRAM_SIZE:
+            raise RegexError("pattern is too large (repetition counts too big)")
         self.prog.append(inst)
         return len(self.prog) - 1
 
-    def compile(self, ast) -> list:
+    def compile(self, ast, anchored_end: bool = False) -> list:
         # Slot 0/1 are the whole-match span; group k uses slots 2k / 2k+1.
         self.emit(ISave(0))
         self._gen(ast)
+        # For fullmatch we require end-of-string *before* closing the match, so
+        # the VM keeps lower-priority branches alive until one actually reaches
+        # the end. (Checking the end after a greedy match instead would wrongly
+        # reject `a|ab` against "ab", where the non-preferred branch is the one
+        # that spans the whole string.)
+        if anchored_end:
+            self.emit(IAssert("end"))
         self.emit(ISave(1))
         self.emit(IMatch())
         return self.prog
@@ -417,8 +435,8 @@ class _Compiler:
 
     def _gen_repeat(self, node: Repeat) -> None:
         lo, hi = node.min, node.max
-        if hi is not None and (hi > _MAX_REPEAT_EXPANSION or lo > _MAX_REPEAT_EXPANSION):
-            raise RegexError("repetition count too large")
+        # No per-node count check is needed: emit() caps the total program size,
+        # which is what bounds compile time and memory however the blow-up arises.
         # `lo` mandatory copies up front.
         for _ in range(lo):
             self._gen(node.node)
@@ -455,6 +473,33 @@ class _Compiler:
         else:
             self.prog[l1].x = l3
             self.prog[l1].y = l1 + 1
+
+
+def make_search_program(prog: list) -> list:
+    """Wrap an anchored program so a single VM pass finds the leftmost match
+    anywhere in the text — in linear time, with no per-offset restart.
+
+    The trick is the classic Pike-VM construction: prepend an implicit *lazy*
+    `.*?` that, at each position, prefers to start matching the real pattern but
+    can otherwise consume one character and try again one place to the right.
+    Because the "start matching now" branch has priority, the leftmost (and then
+    greedy) match wins, exactly as `re.search` would pick it.
+
+        0: split body, 1     # prefer to start the match here...
+        1: anybyte           # ...otherwise skip one character...
+        2: jmp 0             # ...and try again at the next position
+        3: <original program, with control-flow targets shifted by +3>
+    """
+    OFFSET = 3
+    out: list = [ISplit(OFFSET, 1), IAnyByte(), IJmp(0)]
+    for inst in prog:
+        if isinstance(inst, IJmp):
+            out.append(IJmp(inst.x + OFFSET))
+        elif isinstance(inst, ISplit):
+            out.append(ISplit(inst.x + OFFSET, inst.y + OFFSET))
+        else:
+            out.append(inst)
+    return out
 
 
 # ==========================================================================
@@ -547,9 +592,14 @@ class _ThreadList:
                 self.threads.append(_Thread(pc, saved))
 
 
-def _run(prog: list, text: str, start: int) -> list | None:
+def _run(prog: list, text: str, start: int, must_advance: bool = False) -> list | None:
     """Run the program over `text` beginning at index `start`. Returns the
-    saved-positions array of the matching thread, or None."""
+    saved-positions array of the matching thread, or None.
+
+    `must_advance` forbids an *empty* match that begins exactly at `start`,
+    keeping lower-priority threads alive instead. finditer uses it to reproduce
+    re's rule for stepping past a zero-width match without dropping a longer
+    match that begins at the same spot."""
     nslots = max((i.slot for i in prog if isinstance(i, ISave)), default=1) + 1
     clist = _ThreadList(len(prog))
     init = [None] * nslots
@@ -565,6 +615,8 @@ def _run(prog: list, text: str, start: int) -> list | None:
         for th in clist.threads:
             inst = prog[th.pc]
             if isinstance(inst, IMatch):
+                if must_advance and th.saved[0] == start and th.saved[1] == start:
+                    continue  # reject an empty match at the origin; keep looking
                 matched = th.saved
                 # Lower-priority threads can't beat this one, so drop them.
                 break
@@ -579,6 +631,8 @@ def _run(prog: list, text: str, start: int) -> list | None:
             elif isinstance(inst, IClass):
                 if _class_matches(inst.negated, inst.members, ch):
                     nlist.add(prog, th.pc + 1, th.saved, pos + 1, text)
+            elif isinstance(inst, IAnyByte):
+                nlist.add(prog, th.pc + 1, th.saved, pos + 1, text)
         clist = nlist
         if pos >= len(text):
             break
@@ -645,6 +699,11 @@ class Regex:
         ast = parser.parse()
         self.ngroups = parser.ngroups
         self.prog = _Compiler().compile(ast)
+        # A second program with an end-of-string assertion, used by fullmatch.
+        self.prog_full = _Compiler().compile(ast, anchored_end=True)
+        # A third with an implicit lazy `.*?` prefix, so an unanchored search is
+        # a single linear-time VM pass rather than a restart at every offset.
+        self.prog_search = make_search_program(self.prog)
 
     def match(self, text: str) -> Match | None:
         """Match anchored at the start of `text` (it need not reach the end)."""
@@ -653,32 +712,29 @@ class Regex:
 
     def fullmatch(self, text: str) -> Match | None:
         """Match only if the pattern consumes the entire string."""
-        m = self.match(text)
-        if m is not None and m.end() == len(text) and m.start() == 0:
-            return m
-        return None
+        saved = _run(self.prog_full, text, 0)
+        return Match(text, saved, self.ngroups) if saved is not None else None
 
     def search(self, text: str) -> Match | None:
-        """Find the leftmost match anywhere in `text`."""
-        for start in range(len(text) + 1):
-            saved = _run(self.prog, text, start)
-            if saved is not None:
-                return Match(text, saved, self.ngroups)
-        return None
+        """Find the leftmost match anywhere in `text`, in one linear-time pass."""
+        saved = _run(self.prog_search, text, 0)
+        return Match(text, saved, self.ngroups) if saved is not None else None
 
     def finditer(self, text: str):
-        """Yield non-overlapping matches left to right. A zero-width match still
-        advances by one position so the loop always terminates."""
+        """Yield non-overlapping matches left to right, including zero-width ones
+        (matching re's semantics: after an empty match, the next one may not be
+        another empty match at the same position, which keeps the loop moving)."""
         pos = 0
+        must_advance = False
         while pos <= len(text):
-            saved = _run(self.prog, text, pos)
+            # The search program finds the leftmost match at or after `pos`.
+            saved = _run(self.prog_search, text, pos, must_advance)
             if saved is None:
-                pos += 1
-                continue
+                return  # nothing matches anywhere from here on
             m = Match(text, saved, self.ngroups)
             yield m
-            end = m.end()
-            pos = end + 1 if end == m.start() else end
+            must_advance = m.end() == m.start()
+            pos = m.end()
 
     def findall(self, text: str) -> list:
         """All matches as strings (group 0), non-overlapping, left to right."""
