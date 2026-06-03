@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boids — Flocking Studio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <aside id="panel">
+    <h1>Boids</h1>
+    <div class="sub">emergent flocking, three rules</div>
+
+    <div class="palettes" id="palettes"></div>
+
+    <div class="control">
+      <label>Boids <span class="val" id="countVal"></span></label>
+      <input type="range" id="count" min="50" max="3000" step="10" />
+    </div>
+    <div class="control">
+      <label>Perception <span class="val" id="perceptionVal"></span></label>
+      <input type="range" id="perception" min="20" max="140" step="1" />
+    </div>
+    <div class="control">
+      <label>Personal Space <span class="val" id="separationVal"></span></label>
+      <input type="range" id="separation" min="6" max="60" step="1" />
+    </div>
+    <div class="control">
+      <label>Separation <span class="val" id="sepWeightVal"></span></label>
+      <input type="range" id="sepWeight" min="0" max="3" step="0.05" />
+    </div>
+    <div class="control">
+      <label>Alignment <span class="val" id="alignWeightVal"></span></label>
+      <input type="range" id="alignWeight" min="0" max="3" step="0.05" />
+    </div>
+    <div class="control">
+      <label>Cohesion <span class="val" id="cohWeightVal"></span></label>
+      <input type="range" id="cohWeight" min="0" max="3" step="0.05" />
+    </div>
+    <div class="control">
+      <label>Max Speed <span class="val" id="maxSpeedVal"></span></label>
+      <input type="range" id="maxSpeed" min="1" max="7" step="0.1" />
+    </div>
+    <div class="control">
+      <label>Trail Length <span class="val" id="trailVal"></span></label>
+      <input type="range" id="trail" min="0.03" max="0.6" step="0.01" />
+    </div>
+    <div class="control">
+      <label>Boid Size <span class="val" id="sizeVal"></span></label>
+      <input type="range" id="size" min="0.5" max="2.5" step="0.1" />
+    </div>
+
+    <div class="buttons">
+      <button id="pause">Pause</button>
+      <button id="vision">Vision</button>
+      <button id="reseed">Reseed</button>
+      <button id="random">Surprise</button>
+      <button id="save" class="wide">Save PNG ⬇</button>
+    </div>
+
+    <div class="hint">
+      Hold <kbd>left-click</kbd> to gather · <kbd>right-click</kbd> to scatter.<br />
+      <kbd>Space</kbd> pause · <kbd>V</kbd> vision · <kbd>R</kbd> reseed ·
+      <kbd>S</kbd> save · <kbd>H</kbd> hide panel.
+    </div>
+  </aside>
+  <button id="togglePanel" title="Show controls">☰</button>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
