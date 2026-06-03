@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sand — Falling-Sand Playground</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <aside id="panel">
+    <h1>Sand</h1>
+    <div class="sub">cellular physics, with a mouse</div>
+
+    <div class="palette" id="palette"></div>
+
+    <div class="control">
+      <label>Brush Size <span class="val" id="brushVal"></span></label>
+      <input type="range" id="brush" min="0" max="24" step="1" value="5" />
+    </div>
+    <div class="control">
+      <label>Sim Speed <span class="val" id="speedVal"></span></label>
+      <input type="range" id="speed" min="1" max="6" step="1" value="1" />
+    </div>
+
+    <div class="buttons">
+      <button id="pause">Pause</button>
+      <button id="reseed">Reseed</button>
+      <button id="clear">Clear</button>
+      <button id="save" class="wide">Save PNG ⬇</button>
+    </div>
+
+    <div class="hint">
+      Hold <kbd>left-click</kbd> to paint · <kbd>right-click</kbd> to erase.<br />
+      <kbd>1</kbd>–<kbd>7</kbd> pick material · <kbd>Space</kbd> pause ·
+      <kbd>R</kbd> reseed · <kbd>C</kbd> clear · <kbd>S</kbd> save ·
+      <kbd>H</kbd> hide panel.
+    </div>
+  </aside>
+  <button id="togglePanel" title="Show controls">☰</button>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

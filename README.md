@@ -18,11 +18,13 @@ Here's what's in the box so far:
 | [**wavefn**](./wavefn) | Wave Function Collapse — hand it a few tiles and the rules for which edges may touch, and it collapses a blank grid into one pattern where everything lines up. Connected pipes, little coastlines. Terminal art or SVG. | Python (stdlib) |
 | [**reverb**](./reverb) | A reverb built from the bare math — comb and allpass filters wired into a Schroeder/Freeverb tail — that takes a dry WAV and gives it a room to ring in. Comes with a demo that invents its own sound to drench. | Python (stdlib) |
 | [**lsystem**](./lsystem) | Lindenmayer systems — rewrite a tiny string of symbols over and over, then let a turtle walk the result. Koch snowflakes, dragon curves, Hilbert space-fillers and branching weeds fall out as SVG. | Python (stdlib) |
+| [**sand**](./sand) | A falling-sand playground — paint sand, water, walls, wood and fire onto a grid and watch it tumble, pool, burn and smoke. `cellular` grown into 2D and handed a mouse. | Canvas + vanilla JS |
 
 ## Running them
 
-- **flowfield** / **fractal** / **driftwave** / **boids** — open that project's `index.html`
-  in any modern browser. That's it, no server.
+- **flowfield** / **fractal** / **driftwave** / **boids** / **sand** — open that project's
+  `index.html` in any modern browser. That's it, no server. (sand's engine also has a
+  headless smoke test: `node sand/test_sim.mjs`.)
 - **amaze** — `python -m amaze.cli --width 30 --height 15`
   (tests: `python -m pytest amaze/ -q`)
 - **markov** — `python -m markov.cli markov/corpus.txt --order 2 --length 60`
