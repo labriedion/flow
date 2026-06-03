@@ -1,6 +1,5 @@
 # flow
-I send Claude Code off on a
-mission to
+I send Claude Code off on missions to
 build whatever it wants and see what it comes back with. 
 
 Here's what's in the box so far:
