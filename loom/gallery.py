@@ -1,4 +1,30 @@
-<!DOCTYPE html>
+"""Regenerate the gallery and the README table from the mission registry.
+
+The top-level index.html stops being hand-maintained and becomes a build
+artifact of the loop: cards are generated from the registry, each section is
+sorted by the surprise proxy (so the page literally arranges itself by how much
+each mission amplified its rule), and proposed-but-unbuilt missions show up as
+"on the loom". The crafted chrome — hero, palette, the live flow-field behind
+it — is reproduced verbatim.
+"""
+
+import os
+
+from . import registry, surprise
+
+ROOT = registry.ROOT
+
+SCORE_TIP = (
+    "output compresses to this many times the size of the rule that made it "
+    "— a proxy for emergence, not a judgment of taste"
+)
+
+# ---------------------------------------------------------------------------
+# The crafted chrome, reproduced verbatim (plus a .score badge and .loom list).
+# Kept as plain strings — never .format()'d — so the CSS/JS braces are safe.
+# ---------------------------------------------------------------------------
+
+TOP = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -289,136 +315,13 @@
         coastline. The drift behind this page is one of them, running live.
       </p>
     </header>
+"""
 
-    <div class="section-label">
-      Open in a browser
-      <span class="how">just click — no server, no build</span>
-    </div>
-    <section class="grid">
+# %%SECTIONS%% gets spliced in here
 
-      <a class="card" href="./driftwave/index.html">
-        <div class="top"><h2>driftwave</h2><span class="arrow">↗</span></div>
-        <p class="blurb">Generative ambient music that's never the same twice — pads and plucks over a reverb, all improvised on the spot in your browser.</p>
-        <p class="rule">rule → wander the scale, never repeat</p>
-        <div class="foot"><span class="tag">Web Audio API</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 192×</span></div>
-      </a>
-
-      <a class="card" href="./flowfield/index.html">
-        <div class="top"><h2>flowfield</h2><span class="arrow">↗</span></div>
-        <p class="blurb">Thousands of particles drifting through an evolving noise field, leaving trails of light. Every knob is live; save a frame you like.</p>
-        <p class="rule">rule → follow the field at your feet</p>
-        <div class="foot"><span class="tag">Canvas · vanilla JS</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 182×</span></div>
-      </a>
-
-      <a class="card" href="./fractal/index.html">
-        <div class="top"><h2>fractal</h2><span class="arrow">↗</span></div>
-        <p class="blurb">A Mandelbrot &amp; Julia explorer you can fly around in — scroll to zoom, drag to pan, morph the Julia constant with your mouse.</p>
-        <p class="rule">rule → z ↦ z² + c, forever</p>
-        <div class="foot"><span class="tag">Canvas · vanilla JS</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 129×</span></div>
-      </a>
-
-      <a class="card" href="./boids/index.html">
-        <div class="top"><h2>boids</h2><span class="arrow">↗</span></div>
-        <p class="blurb">A flock nobody steers — thousands of agents on three local rules, swirling into murmurations you gather and scatter with the mouse.</p>
-        <p class="rule">rule → separate · align · cohere</p>
-        <div class="foot"><span class="tag">Canvas · vanilla JS</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 31×</span></div>
-      </a>
-
-      <a class="card" href="./sand/index.html">
-        <div class="top"><h2>sand</h2><span class="arrow">↗</span></div>
-        <p class="blurb">A falling-sand playground — paint sand, water, walls, wood and fire onto a grid and watch it tumble, pool, burn and smoke.</p>
-        <p class="rule">rule → every cell minds only its neighbours</p>
-        <div class="foot"><span class="tag">Canvas · vanilla JS</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 0.1×</span></div>
-      </a>
-
-    </section>
-
-    <div class="section-label">
-      Run in a terminal
-      <span class="how">pure Python stdlib · tests with pytest</span>
-    </div>
-    <section class="grid">
-
-      <a class="card" href="./reverb/README.md">
-        <div class="top"><h2>reverb</h2><span class="arrow">→</span></div>
-        <p class="blurb">A reverb from the bare math — comb and allpass filters wired into a Schroeder/Freeverb tail that gives a dry WAV a room to ring in.</p>
-        <p class="rule">rule → echo, fold, echo again</p>
-        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> reverb.cli --demo</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 20×</span></div>
-      </a>
-
-      <a class="card" href="./cellular/README.md">
-        <div class="top"><h2>cellular</h2><span class="arrow">→</span></div>
-        <p class="blurb">Wolfram's 1-D cellular automata. Hand it a rule from 0–255 and watch Sierpinski triangles and pure chaos fall out. Art or SVG.</p>
-        <p class="rule">rule → one number is the whole physics</p>
-        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> cellular.cli</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 4.8×</span></div>
-      </a>
-
-      <a class="card" href="./amaze/README.md">
-        <div class="top"><h2>amaze</h2><span class="arrow">→</span></div>
-        <p class="blurb">Mazes in your terminal — generate them, braid in loops, then watch BFS or A* find the way through. Exports SVG too.</p>
-        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> amaze.cli</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 0.9×</span></div>
-      </a>
-
-      <a class="card" href="./lsystem/README.md">
-        <div class="top"><h2>lsystem</h2><span class="arrow">→</span></div>
-        <p class="blurb">Rewrite a tiny string of symbols over and over, then let a turtle walk the result — snowflakes, dragon curves, branching weeds as SVG.</p>
-        <p class="rule">rule → replace every symbol, all at once</p>
-        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> lsystem.cli</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 0.7×</span></div>
-      </a>
-
-      <a class="card" href="./wavefn/README.md">
-        <div class="top"><h2>wavefn</h2><span class="arrow">→</span></div>
-        <p class="blurb">Wave Function Collapse — a few tiles and the rules for which edges may touch, collapsed into one grid where everything lines up.</p>
-        <p class="rule">rule → keep only what still fits</p>
-        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> wavefn.cli</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 0.6×</span></div>
-      </a>
-
-      <a class="card" href="./markov/README.md">
-        <div class="top"><h2>markov</h2><span class="arrow">→</span></div>
-        <p class="blurb">Feed it any text and it babbles back in the same style, word-by-word or letter-by-letter. Good for fake prose and invented words.</p>
-        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> markov.cli</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 0.2×</span></div>
-      </a>
-
-      <a class="card" href="./calc/README.md">
-        <div class="top"><h2>calc</h2><span class="arrow">→</span></div>
-        <p class="blurb">A proper little expression evaluator — tokenizer, parser, the works — with functions, constants and variables. Comes with a REPL.</p>
-        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> calc.cli</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 0.1×</span></div>
-      </a>
-
-      <a class="card" href="./reggie/README.md">
-        <div class="top"><h2>reggie</h2><span class="arrow">→</span></div>
-        <p class="blurb">A regex engine from scratch — pattern to bytecode to a VM that matches in linear time and never catastrophically backtracks.</p>
-        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> reggie.cli</span><span class="score" title="output compresses to this many times the size of the rule that made it — a proxy for emergence, not a judgment of taste">✦ 0.1×</span></div>
-      </a>
-
-    </section>
-
-
-    <div class="section-label">
-      On the loom
-      <span class="how">proposed by loom · nobody has built these yet</span>
-    </div>
-    <section class="loom-list">
-
-      <div class="loom-item">
-        <p class="name">fenchurn</p>
-        <p class="brief">Take a heap of edge-matching tiles. Give every part one local rule — average yourself toward your neighbours — and no global plan. Render it to a standalone SVG, but with one cell that disobeys. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself.</p>
-      </div>
-
-      <div class="loom-item">
-        <p class="name">saltcrawl</p>
-        <p class="brief">Take a swarm of drifting particles. Give every part one local rule — split in two whenever you grow past a threshold — and no global plan. Render it to a standalone SVG, but wrap the boundary so it has no edge. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself.</p>
-      </div>
-
-      <div class="loom-item">
-        <p class="name">glintveil</p>
-        <p class="brief">Take a lattice of coupled springs. Give every part one local rule — react and diffuse with the chemical beside you — and no global plan. Render it to an HTML canvas you can poke with the mouse. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself.</p>
-      </div>
-
-    </section>
-
+BOTTOM = """
     <footer>
-      13 small things, each built on a mission with no spec but its own
+      %%COUNT%% small things, each built on a mission with no spec but its own
       taste — now sorted by how much each amplified its rule (a proxy for
       emergence, generated by <a href="./loom/README.md">loom</a>, not a judgment
       of taste). Source &amp; how-to-run for every one lives in the
@@ -549,3 +452,129 @@
   </script>
 </body>
 </html>
+"""
+
+SECTION_LABELS = {
+    "browser": ("Open in a browser", "just click — no server, no build"),
+    "terminal": ("Run in a terminal", "pure Python stdlib · tests with pytest"),
+}
+
+
+def _esc(s):
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _card(m, amp):
+    arrow = "↗" if m["medium"] == "browser" else "→"
+    rows = [
+        f'      <a class="card" href="{m["href"]}">',
+        f'        <div class="top"><h2>{_esc(m["title"])}</h2><span class="arrow">{arrow}</span></div>',
+        f'        <p class="blurb">{_esc(m["blurb"])}</p>',
+    ]
+    if m.get("rule"):
+        rows.append(f'        <p class="rule">rule → {_esc(m["rule"])}</p>')
+    foot = [f'<span class="tag">{_esc(m["tag"])}</span>']
+    if m.get("run"):
+        rest = m["run"].replace("python -m ", "")
+        foot.append(f'<span class="run"><b>python -m</b> {_esc(rest)}</span>')
+    label = "✦ " + surprise.fmt_amplification(amp)
+    foot.append(f'<span class="score" title="{SCORE_TIP}">{label}</span>')
+    rows.append('        <div class="foot">' + "".join(foot) + "</div>")
+    rows.append("      </a>")
+    return "\n".join(rows)
+
+
+def _section(medium, missions, amps):
+    group = [m for m in missions if m["medium"] == medium]
+    # the page sorts itself by how much each mission amplified its rule
+    group.sort(key=lambda m: amps.get(m["id"], 0), reverse=True)
+    if not group:
+        return ""
+    title, how = SECTION_LABELS[medium]
+    out = [
+        '    <div class="section-label">',
+        f"      {title}",
+        f'      <span class="how">{how}</span>',
+        "    </div>",
+        '    <section class="grid">',
+        "",
+    ]
+    for m in group:
+        out.append(_card(m, amps.get(m["id"], 0)))
+        out.append("")
+    out.append("    </section>")
+    return "\n".join(out)
+
+
+def _loom_section(missions):
+    proposed = registry.proposed(missions)
+    if not proposed:
+        return ""
+    out = [
+        "",
+        '    <div class="section-label">',
+        "      On the loom",
+        '      <span class="how">proposed by loom · nobody has built these yet</span>',
+        "    </div>",
+        '    <section class="loom-list">',
+        "",
+    ]
+    for m in proposed:
+        out.append('      <div class="loom-item">')
+        out.append(f'        <p class="name">{_esc(m["title"])}</p>')
+        out.append(f'        <p class="brief">{_esc(m["prompt"])}</p>')
+        out.append("      </div>")
+        out.append("")
+    out.append("    </section>")
+    return "\n".join(out)
+
+
+def build_index(missions):
+    """Return the full index.html as a string."""
+    built = registry.built(missions)
+    amps = {s["id"]: s["amplification"] for s in surprise.score_all(missions)}
+    sections = [
+        _section("browser", built, amps),
+        _section("terminal", built, amps),
+        _loom_section(missions),
+    ]
+    body = "\n\n".join(s for s in sections if s)
+    bottom = BOTTOM.replace("%%COUNT%%", str(len(built)))
+    return TOP + "\n" + body + "\n" + bottom
+
+
+def build_readme_table(missions):
+    """Reproduce the README project table from the registry, in registry order."""
+    lines = ["| Project | What it is | Built with |", "| --- | --- | --- |"]
+    for m in registry.built(missions):
+        lines.append(f'| [**{m["id"]}**](./{m["id"]}) | {m["summary"]} | {m["built_with"]} |')
+    return "\n".join(lines)
+
+
+TABLE_START = "<!-- loom:table:start -->"
+TABLE_END = "<!-- loom:table:end -->"
+
+
+def write_index(missions, path=None):
+    path = path or os.path.join(ROOT, "index.html")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(build_index(missions))
+    return path
+
+
+def update_readme(missions, path=None):
+    path = path or os.path.join(ROOT, "README.md")
+    with open(path, encoding="utf-8") as fh:
+        text = fh.read()
+    if TABLE_START not in text or TABLE_END not in text:
+        raise RuntimeError(
+            f"README is missing the {TABLE_START} / {TABLE_END} markers; "
+            "add them around the project table so loom can regenerate it."
+        )
+    head, rest = text.split(TABLE_START, 1)
+    _, tail = rest.split(TABLE_END, 1)
+    table = build_readme_table(missions)
+    new = f"{head}{TABLE_START}\n{table}\n{TABLE_END}{tail}"
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(new)
+    return path
