@@ -15,6 +15,7 @@ Here's what's in the box so far:
 | [**reggie**](./reggie) | A regex engine built from scratch — pattern to bytecode to a virtual machine that matches in linear time and never catastrophically backtracks. Captures and all. | Python (stdlib) |
 | [**cellular**](./cellular) | Wolfram's one-dimensional cellular automata. Feed it a rule number from 0–255 and watch Sierpinski triangles and pure chaos fall out. Terminal art or SVG. | Python (stdlib) |
 | [**boids**](./boids) | A flock that nobody's steering — thousands of agents following three local rules, swirling into murmurations you can gather and scatter with the mouse. | Canvas + vanilla JS |
+| [**wavefn**](./wavefn) | Wave Function Collapse — hand it a few tiles and the rules for which edges may touch, and it collapses a blank grid into one pattern where everything lines up. Connected pipes, little coastlines. Terminal art or SVG. | Python (stdlib) |
 
 ## Running them
 
@@ -30,3 +31,6 @@ Here's what's in the box so far:
   (tests: `python -m pytest reggie/ -q`)
 - **cellular** — `python -m cellular.cli --rule 30`, or `--rule 90` for a
   Sierpinski triangle (tests: `python -m pytest cellular/ -q`)
+- **wavefn** — `python -m wavefn.cli --tileset pipes --seed 7`, or
+  `--tileset terrain` (write an SVG with `--svg out.svg`;
+  tests: `python -m pytest wavefn/ -q`)
