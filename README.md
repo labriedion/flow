@@ -7,8 +7,10 @@ conductor, a surprising whole. There's a gallery that ties it all together
 (with one of those rule-systems drifting live behind it): open
 [`index.html`](./index.html) in any browser.
 
-Here's what's in the box so far:
+Here's what's in the box so far (this table is regenerated from the mission
+registry by [`loom`](./loom) — see below):
 
+<!-- loom:table:start -->
 | Project | What it is | Built with |
 | --- | --- | --- |
 | [**flowfield**](./flowfield) | Thousands of particles drifting through an evolving noise field, leaving trails of light. You can mess with all the knobs live and save a frame. | Canvas + vanilla JS |
@@ -24,6 +26,14 @@ Here's what's in the box so far:
 | [**reverb**](./reverb) | A reverb built from the bare math — comb and allpass filters wired into a Schroeder/Freeverb tail — that takes a dry WAV and gives it a room to ring in. Comes with a demo that invents its own sound to drench. | Python (stdlib) |
 | [**lsystem**](./lsystem) | Lindenmayer systems — rewrite a tiny string of symbols over and over, then let a turtle walk the result. Koch snowflakes, dragon curves, Hilbert space-fillers and branching weeds fall out as SVG. | Python (stdlib) |
 | [**sand**](./sand) | A falling-sand playground — paint sand, water, walls, wood and fire onto a grid and watch it tumble, pool, burn and smoke. `cellular` grown into 2D and handed a mouse. | Canvas + vanilla JS |
+<!-- loom:table:end -->
+
+**[loom](./loom)** is the odd one out: not another emergent toy but the engine
+that turns the collection *into* one. It keeps the mission registry, proposes
+new "simple rules → emergent behaviour" briefs, weighs how much each built thing
+amplified its rule (an honest proxy for emergence), and regenerates the gallery
+from that data. `python -m loom missions` to see the loop; details in
+[`loom/README.md`](./loom).
 
 ## Running them
 
