@@ -16,6 +16,7 @@ Here's what's in the box so far:
 | [**cellular**](./cellular) | Wolfram's one-dimensional cellular automata. Feed it a rule number from 0–255 and watch Sierpinski triangles and pure chaos fall out. Terminal art or SVG. | Python (stdlib) |
 | [**boids**](./boids) | A flock that nobody's steering — thousands of agents following three local rules, swirling into murmurations you can gather and scatter with the mouse. | Canvas + vanilla JS |
 | [**wavefn**](./wavefn) | Wave Function Collapse — hand it a few tiles and the rules for which edges may touch, and it collapses a blank grid into one pattern where everything lines up. Connected pipes, little coastlines. Terminal art or SVG. | Python (stdlib) |
+| [**reverb**](./reverb) | A reverb built from the bare math — comb and allpass filters wired into a Schroeder/Freeverb tail — that takes a dry WAV and gives it a room to ring in. Comes with a demo that invents its own sound to drench. | Python (stdlib) |
 
 ## Running them
 
@@ -34,3 +35,6 @@ Here's what's in the box so far:
 - **wavefn** — `python -m wavefn.cli --tileset pipes --seed 7`, or
   `--tileset terrain` (write an SVG with `--svg out.svg`;
   tests: `python -m pytest wavefn/ -q`)
+- **reverb** — `python -m reverb.cli --demo out.wav` to hear it drench a synth
+  pluck, or `python -m reverb.cli in.wav out.wav --room 0.8 --wet 0.35`
+  (tests: `python -m pytest reverb/ -q`)
