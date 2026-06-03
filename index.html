@@ -408,6 +408,7 @@
         ctx.fillStyle = "#05070d";
         ctx.fillRect(0, 0, W, H);
         seed();
+        if (reduced) settle();   // reduced-motion: hold one static frame
       }
 
       function seed() {
@@ -436,7 +437,8 @@
         return a * 0.9 * TAU;
       }
 
-      function step() {
+      // advance + draw one frame's worth of the field, no scheduling
+      function draw() {
         t += 0.0016;
         // fade the previous frame slightly to leave trails
         ctx.fillStyle = "rgba(5, 7, 13, 0.055)";
@@ -469,10 +471,20 @@
           }
         }
         ctx.globalCompositeOperation = "source-over";
+      }
+
+      function step() {
+        draw();
         raf = requestAnimationFrame(step);
       }
 
+      // a single calm, static frame — no motion for those who asked for none
+      function settle() {
+        for (let i = 0; i < 240; i++) draw();
+      }
+
       function start() {
+        if (reduced) return;            // honour prefers-reduced-motion
         if (raf == null) raf = requestAnimationFrame(step);
       }
       function stop() {
@@ -485,13 +497,7 @@
       });
 
       resize();
-      if (reduced) {
-        // one calm pass, then hold — no motion for those who asked for none
-        for (let i = 0; i < 240; i++) step();
-        stop();
-      } else {
-        start();
-      }
+      if (!reduced) start();
     })();
   </script>
 </body>
