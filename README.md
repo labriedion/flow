@@ -1,17 +1,7 @@
 # flow
-
-So the whole idea here is pretty simple: this is where I send Claude Code off on
-missions and see what it comes back with. One day I was bored, told it to
-surprise me and just build whatever it felt like, and `flow` is what came out of
-that — a little collection of small, self-contained projects, each one poking at
-a different corner of programming.
-
-I had a couple of rules I cared about. No dependencies, no build steps, nothing
-you have to install or configure. The browser ones you literally just open. The
-Python ones run on the standard library and nothing else. And everything has to
-actually work — so the Python projects come with real test suites, and every
-project ships with an example artifact (an image, a sound clip, a sample output)
-so you can see what it does straight from its README without running a thing.
+I send Claude Code off on a
+mission to
+build whatever it wants and see what it comes back with. 
 
 Here's what's in the box so far:
 
@@ -34,14 +24,3 @@ Here's what's in the box so far:
   (tests: `python -m pytest markov/ -q`)
 - **calc** — `python -m calc.cli "2 + 3 * 4"`, or just `python -m calc.cli` for
   the REPL (tests: `python -m pytest calc/ -q`)
-
-## A thing I didn't plan
-
-Honestly half the fun was letting it pick the projects itself. And the name ended
-up fitting way better than I meant it to — there's a flow *field*, you *flow*
-through a maze, and there's ambient music literally for getting into *flow*. I
-didn't ask for any of that, it just happened.
-
-> The little scripts under [`tools/`](./tools) are what generated the example
-> images and the audio clip — pure-Python ports of the browser projects, so the
-> artifacts are made by the same math the real things run on.
