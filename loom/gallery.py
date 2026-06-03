@@ -461,13 +461,19 @@ SECTION_LABELS = {
 
 
 def _esc(s):
-    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    # safe for both text content and double-quoted attribute values
+    return (
+        s.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
 
 def _card(m, amp):
     arrow = "↗" if m["medium"] == "browser" else "→"
     rows = [
-        f'      <a class="card" href="{m["href"]}">',
+        f'      <a class="card" href="{_esc(m["href"])}">',
         f'        <div class="top"><h2>{_esc(m["title"])}</h2><span class="arrow">{arrow}</span></div>',
         f'        <p class="blurb">{_esc(m["blurb"])}</p>',
     ]

@@ -126,6 +126,15 @@ def test_index_escapes_ampersands():
     assert "Mandelbrot & Julia" not in html
 
 
+def test_card_escapes_attribute_values():
+    # a (hypothetical) href with a quote must not break out of the attribute
+    m = dict(registry.built(registry.load())[0])
+    m["href"] = './x.html?q="bad'
+    html = gallery._card(m, 1.0)
+    assert '&quot;bad' in html
+    assert 'href="./x.html?q="bad"' not in html
+
+
 def test_readme_table_has_every_built_mission():
     missions = registry.load()
     table = gallery.build_readme_table(missions)
