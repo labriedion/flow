@@ -12,6 +12,7 @@ Here's what's in the box so far:
 | [**amaze**](./amaze) | Mazes in your terminal — generate them, braid in some loops, then watch BFS or A\* find the way through. Can spit out an SVG too. | Python (stdlib) |
 | [**markov**](./markov) | Feed it any text and it babbles back in the same style, word-by-word or letter-by-letter. Good for fake prose and invented words. | Python (stdlib) |
 | [**calc**](./calc) | A proper little expression evaluator — tokenizer, parser, the works — with functions, constants and variables. Comes with a REPL. | Python (stdlib) |
+| [**reggie**](./reggie) | A regex engine built from scratch — pattern to bytecode to a virtual machine that matches in linear time and never catastrophically backtracks. Captures and all. | Python (stdlib) |
 
 ## Running them
 
@@ -23,3 +24,5 @@ Here's what's in the box so far:
   (tests: `python -m pytest markov/ -q`)
 - **calc** — `python -m calc.cli "2 + 3 * 4"`, or just `python -m calc.cli` for
   the REPL (tests: `python -m pytest calc/ -q`)
+- **reggie** — `python -m reggie.cli '\d+' "order 66 ships 1024"`
+  (tests: `python -m pytest reggie/ -q`)
