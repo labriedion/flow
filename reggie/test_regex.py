@@ -42,6 +42,17 @@ def test_anchors():
     assert reggie.search("cat$", "cat sat") is None
 
 
+def test_dollar_matches_before_a_final_trailing_newline():
+    # Like re (non-multiline): `$` matches at end of string OR just before a
+    # newline that is the last character — but not before a non-final newline.
+    assert reggie.search("a$", "a\n").span() == (0, 1)
+    assert reggie.search("$", "x\n").span() == (1, 1)
+    assert reggie.search("a$", "a\n\n") is None
+    # fullmatch stays strict: it must consume the whole string, newline and all.
+    assert reggie.fullmatch("a", "a\n") is None
+    assert reggie.fullmatch(r"a\n", "a\n") is not None
+
+
 def test_fullmatch_requires_whole_string():
     assert reggie.fullmatch("a+", "aaa") is not None
     assert reggie.fullmatch("a+", "aaab") is None
@@ -90,6 +101,17 @@ def test_brace_that_is_not_a_quantifier_is_literal():
     # `{` not followed by a valid count is an ordinary character.
     assert reggie.fullmatch("a{b}", "a{b}") is not None
     assert reggie.fullmatch(r"x\{2\}", "x{2}") is not None
+
+
+def test_zero_repetition_of_capturing_group():
+    # `{0}` on a capturing group matches it zero times; the group simply did not
+    # participate, so it reports None (it must not raise). Cross-check with re.
+    for pat, text in [("(a){0}", "a"), ("(a){0,0}", "a"), ("x(ab){0}y", "xy")]:
+        m = reggie.search(pat, text)
+        assert m is not None
+        assert m.groups() == re.search(pat, text).groups()
+    # A later group still captures normally.
+    assert reggie.search("(a){0}(b)", "b").groups() == (None, "b")
 
 
 # --------------------------------------------------------------------------
@@ -252,7 +274,8 @@ def _random_pattern(rng: random.Random) -> str:
     are guaranteed to agree on leftmost-greedy semantics."""
     atoms = ["a", "b", "c", ".", "[ab]", "[^ab]", r"\d", r"\w",
              "(a)", "(ab)", "(a|b)", "(?:ab)"]
-    quants = ["", "", "*", "+", "?", "*?", "+?", "??", "{2}", "{1,3}", "{2,}"]
+    quants = ["", "", "*", "+", "?", "*?", "+?", "??",
+              "{0}", "{2}", "{0,2}", "{1,3}", "{2,}"]
     parts = []
     for _ in range(rng.randint(1, 5)):
         atom = rng.choice(atoms)
@@ -270,7 +293,8 @@ def _random_pattern(rng: random.Random) -> str:
 
 
 def _random_text(rng: random.Random) -> str:
-    alphabet = "abc012 "
+    # Newlines are included so the `$` anchor and `.` (no-newline) are exercised.
+    alphabet = "abc012 \n"
     return "".join(rng.choice(alphabet) for _ in range(rng.randint(0, 8)))
 
 
@@ -290,7 +314,7 @@ def test_differential_against_re():
         # `pattern.match(text, pos)` and reggie running from the same `pos` must
         # agree on whether there's a match and on its full span (group 0).
         for pos in range(len(text) + 1):
-            saved = _run(mine.prog, text, pos)
+            saved = _run(mine.prog, text, pos, nslots=mine._nslots)
             a = Match(text, saved, mine.ngroups) if saved is not None else None
             b = theirs.match(text, pos)
             assert (a is None) == (b is None), (pat, text, pos)

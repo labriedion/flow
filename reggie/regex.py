@@ -378,9 +378,10 @@ class _Compiler:
         # the VM keeps lower-priority branches alive until one actually reaches
         # the end. (Checking the end after a greedy match instead would wrongly
         # reject `a|ab` against "ab", where the non-preferred branch is the one
-        # that spans the whole string.)
+        # that spans the whole string.) This is a *strict* end-of-string, unlike
+        # the `$` anchor, which also matches before a final trailing newline.
         if anchored_end:
-            self.emit(IAssert("end"))
+            self.emit(IAssert("stringend"))
         self.emit(ISave(1))
         self.emit(IMatch())
         return self.prog
@@ -583,8 +584,15 @@ class _ThreadList:
                 nsaved[inst.slot] = pos
                 stack.append((pc + 1, nsaved))
             elif isinstance(inst, IAssert):
-                ok = (inst.where == "start" and pos == 0) or (
-                    inst.where == "end" and pos == len(text))
+                if inst.where == "start":
+                    ok = pos == 0
+                elif inst.where == "end":
+                    # `$`: end of string, or just before a newline that is the
+                    # final character (re's default, non-multiline behaviour).
+                    ok = pos == len(text) or (
+                        pos == len(text) - 1 and text[pos] == "\n")
+                else:  # "stringend": a true end-of-string, used by fullmatch
+                    ok = pos == len(text)
                 if ok:
                     stack.append((pc + 1, saved))
             else:
@@ -592,15 +600,22 @@ class _ThreadList:
                 self.threads.append(_Thread(pc, saved))
 
 
-def _run(prog: list, text: str, start: int, must_advance: bool = False) -> list | None:
+def _run(prog: list, text: str, start: int, must_advance: bool = False,
+         nslots: int | None = None) -> list | None:
     """Run the program over `text` beginning at index `start`. Returns the
     saved-positions array of the matching thread, or None.
 
     `must_advance` forbids an *empty* match that begins exactly at `start`,
     keeping lower-priority threads alive instead. finditer uses it to reproduce
     re's rule for stepping past a zero-width match without dropping a longer
-    match that begins at the same spot."""
-    nslots = max((i.slot for i in prog if isinstance(i, ISave)), default=1) + 1
+    match that begins at the same spot.
+
+    `nslots` sets the size of the saved-positions array. Callers that know the
+    group count pass it so the array always has a slot per group — even for a
+    group that never runs (e.g. `(a){0}`), whose slots would otherwise be
+    missing and make Match.groups() raise instead of reporting None."""
+    if nslots is None:
+        nslots = max((i.slot for i in prog if isinstance(i, ISave)), default=1) + 1
     clist = _ThreadList(len(prog))
     init = [None] * nslots
     clist.add(prog, 0, init, start, text)
@@ -704,20 +719,23 @@ class Regex:
         # A third with an implicit lazy `.*?` prefix, so an unanchored search is
         # a single linear-time VM pass rather than a restart at every offset.
         self.prog_search = make_search_program(self.prog)
+        # One saved-position slot pair per group (plus group 0), so the captures
+        # array is always full-width regardless of which groups actually ran.
+        self._nslots = 2 * (self.ngroups + 1)
 
     def match(self, text: str) -> Match | None:
         """Match anchored at the start of `text` (it need not reach the end)."""
-        saved = _run(self.prog, text, 0)
+        saved = _run(self.prog, text, 0, nslots=self._nslots)
         return Match(text, saved, self.ngroups) if saved is not None else None
 
     def fullmatch(self, text: str) -> Match | None:
         """Match only if the pattern consumes the entire string."""
-        saved = _run(self.prog_full, text, 0)
+        saved = _run(self.prog_full, text, 0, nslots=self._nslots)
         return Match(text, saved, self.ngroups) if saved is not None else None
 
     def search(self, text: str) -> Match | None:
         """Find the leftmost match anywhere in `text`, in one linear-time pass."""
-        saved = _run(self.prog_search, text, 0)
+        saved = _run(self.prog_search, text, 0, nslots=self._nslots)
         return Match(text, saved, self.ngroups) if saved is not None else None
 
     def finditer(self, text: str):
@@ -728,7 +746,7 @@ class Regex:
         must_advance = False
         while pos <= len(text):
             # The search program finds the leftmost match at or after `pos`.
-            saved = _run(self.prog_search, text, pos, must_advance)
+            saved = _run(self.prog_search, text, pos, must_advance, self._nslots)
             if saved is None:
                 return  # nothing matches anywhere from here on
             m = Match(text, saved, self.ngroups)

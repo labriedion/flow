@@ -109,10 +109,11 @@ rx.search("aXbYb").span()            # (0, 3)  — lazy quantifier
 | `\n \t \r`, `\.` `\*` … | escapes for whitespace and metacharacters |
 | `^` `$` | anchors: start / end of the string |
 
-`^` and `$` anchor to the start and end of the whole string (there's no
-multiline mode), which keeps their meaning simple and predictable. The `\d \w
-\s` shorthands use Python's own Unicode-aware character tests, so `\d` matches
-any Unicode digit and `\w` any Unicode letter/digit/underscore — not just ASCII.
+`^` matches the start of the string and `$` the end — or, like `re`'s default
+(non-multiline) behaviour, just before a single trailing newline. There's no
+multiline mode. The `\d \w \s` shorthands use Python's own Unicode-aware
+character tests, so `\d` matches any Unicode digit and `\w` any Unicode
+letter/digit/underscore — not just ASCII.
 
 ## Test it
 
