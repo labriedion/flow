@@ -17,6 +17,7 @@ Here's what's in the box so far:
 | [**boids**](./boids) | A flock that nobody's steering — thousands of agents following three local rules, swirling into murmurations you can gather and scatter with the mouse. | Canvas + vanilla JS |
 | [**wavefn**](./wavefn) | Wave Function Collapse — hand it a few tiles and the rules for which edges may touch, and it collapses a blank grid into one pattern where everything lines up. Connected pipes, little coastlines. Terminal art or SVG. | Python (stdlib) |
 | [**reverb**](./reverb) | A reverb built from the bare math — comb and allpass filters wired into a Schroeder/Freeverb tail — that takes a dry WAV and gives it a room to ring in. Comes with a demo that invents its own sound to drench. | Python (stdlib) |
+| [**lsystem**](./lsystem) | Lindenmayer systems — rewrite a tiny string of symbols over and over, then let a turtle walk the result. Koch snowflakes, dragon curves, Hilbert space-fillers and branching weeds fall out as SVG. | Python (stdlib) |
 
 ## Running them
 
@@ -38,3 +39,5 @@ Here's what's in the box so far:
 - **reverb** — `python -m reverb.cli --demo out.wav` to hear it drench a synth
   pluck, or `python -m reverb.cli in.wav out.wav --room 0.8 --wet 0.35`
   (tests: `python -m pytest reverb/ -q`)
+- **lsystem** — `python -m lsystem.cli --preset snowflake --iterations 4 -o snowflake.svg`,
+  or `--list` to see them all (tests: `python -m pytest lsystem/ -q`)
