@@ -14,10 +14,11 @@ Here's what's in the box so far:
 | [**calc**](./calc) | A proper little expression evaluator — tokenizer, parser, the works — with functions, constants and variables. Comes with a REPL. | Python (stdlib) |
 | [**reggie**](./reggie) | A regex engine built from scratch — pattern to bytecode to a virtual machine that matches in linear time and never catastrophically backtracks. Captures and all. | Python (stdlib) |
 | [**cellular**](./cellular) | Wolfram's one-dimensional cellular automata. Feed it a rule number from 0–255 and watch Sierpinski triangles and pure chaos fall out. Terminal art or SVG. | Python (stdlib) |
+| [**boids**](./boids) | A flock that nobody's steering — thousands of agents following three local rules, swirling into murmurations you can gather and scatter with the mouse. | Canvas + vanilla JS |
 
 ## Running them
 
-- **flowfield** / **fractal** / **driftwave** — open that project's `index.html`
+- **flowfield** / **fractal** / **driftwave** / **boids** — open that project's `index.html`
   in any modern browser. That's it, no server.
 - **amaze** — `python -m amaze.cli --width 30 --height 15`
   (tests: `python -m pytest amaze/ -q`)
