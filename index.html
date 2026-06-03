@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>flow — build whatever it wants</title>
+  <meta name="description" content="A collection of small programs Claude Code built when the only brief was: build whatever you want. It keeps reaching for emergence." />
+  <style>
+    :root {
+      --bg: #05070d;
+      --panel-bg: rgba(16, 18, 27, 0.72);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --accent: #21d4fd;
+      --accent-2: #b388ff;
+      --text: #e7ecf3;
+      --muted: #8b93a7;
+      --faint: #545c70;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    /* live flow-field hero, fixed behind everything */
+    #field {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      z-index: 0;
+      pointer-events: none;
+    }
+    /* a vignette so text stays readable over the drift */
+    #veil {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(120% 80% at 50% 0%, rgba(5,7,13,0.35), rgba(5,7,13,0.78) 60%, rgba(5,7,13,0.93) 100%);
+    }
+    main {
+      position: relative;
+      z-index: 2;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 22px 90px;
+    }
+
+    /* ---- hero / manifesto ---- */
+    header.hero {
+      padding: 16vh 0 7vh;
+    }
+    .kicker {
+      font-size: 11px;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 18px;
+    }
+    h1.title {
+      font-size: clamp(54px, 13vw, 132px);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      margin: 0;
+      font-weight: 700;
+      background: linear-gradient(120deg, var(--text) 30%, var(--accent) 70%, var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .lede {
+      font-size: clamp(15px, 2.1vw, 19px);
+      line-height: 1.6;
+      max-width: 30em;
+      margin: 26px 0 0;
+      color: var(--text);
+    }
+    .lede .em { color: var(--accent); }
+    .note {
+      font-size: 13.5px;
+      line-height: 1.7;
+      max-width: 33em;
+      margin: 22px 0 0;
+      color: var(--muted);
+    }
+    .note strong { color: var(--text); font-weight: 600; }
+
+    /* ---- section label ---- */
+    .section-label {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin: 54px 0 18px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .section-label::before {
+      content: "";
+      width: 22px;
+      height: 1px;
+      background: var(--accent);
+      align-self: center;
+    }
+    .section-label .how {
+      margin-left: auto;
+      letter-spacing: 0.06em;
+      text-transform: none;
+      color: var(--faint);
+    }
+
+    /* ---- grid of projects ---- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(248px, 1fr));
+      gap: 14px;
+    }
+    a.card {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 16px 16px 14px;
+      backdrop-filter: blur(13px) saturate(140%);
+      -webkit-backdrop-filter: blur(13px) saturate(140%);
+      transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    a.card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(80% 60% at 0% 0%, rgba(33,212,253,0.10), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      pointer-events: none;
+    }
+    a.card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(33,212,253,0.4);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    }
+    a.card:hover::after { opacity: 1; }
+    .card .top {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 9px;
+    }
+    .card h2 {
+      font-size: 15px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 0;
+      color: var(--text);
+    }
+    .card .arrow {
+      margin-left: auto;
+      color: var(--accent);
+      font-size: 13px;
+      opacity: 0.6;
+      transition: transform 0.16s ease, opacity 0.16s ease;
+    }
+    a.card:hover .arrow { opacity: 1; transform: translate(2px, -2px); }
+    .card .blurb {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text);
+      opacity: 0.9;
+      margin: 0 0 12px;
+      flex: 1;
+    }
+    .card .rule {
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--accent);
+      opacity: 0.85;
+      margin: 0 0 12px;
+      font-style: italic;
+    }
+    .card .foot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 10px;
+    }
+    .tag {
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      padding: 3px 7px;
+    }
+    .run {
+      font-size: 10.5px;
+      color: var(--muted);
+      margin-left: auto;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 62%;
+    }
+    .run b { color: var(--accent); font-weight: 600; }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 22px;
+      border-top: 1px solid var(--panel-border);
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 540px) {
+      header.hero { padding: 11vh 0 5vh; }
+      .run { max-width: 100%; margin-left: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      a.card { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="field"></canvas>
+  <div id="veil"></div>
+
+  <main>
+    <header class="hero">
+      <p class="kicker">a collection · build whatever it wants</p>
+      <h1 class="title">flow</h1>
+      <p class="lede">
+        I send Claude Code off on missions to build <span class="em">whatever it
+        wants</span> — and see what it comes back with.
+      </p>
+      <p class="note">
+        What it keeps coming back with is <strong>emergence</strong>. Given a blank
+        brief, again and again it reaches for the same idea: a handful of simple,
+        local rules — followed faithfully by thousands of tiny parts that have no
+        plan — blooming into something nobody choreographed. A flock. A dune. A
+        coastline. The drift behind this page is one of them, running live.
+      </p>
+    </header>
+
+    <div class="section-label">
+      Open in a browser
+      <span class="how">just click — no server, no build</span>
+    </div>
+    <section class="grid">
+
+      <a class="card" href="./flowfield/index.html">
+        <div class="top"><h2>flowfield</h2><span class="arrow">↗</span></div>
+        <p class="blurb">Thousands of particles drifting through an evolving noise
+          field, leaving trails of light. Every knob is live; save a frame you like.</p>
+        <p class="rule">rule → follow the field at your feet</p>
+        <div class="foot"><span class="tag">Canvas · vanilla JS</span></div>
+      </a>
+
+      <a class="card" href="./fractal/index.html">
+        <div class="top"><h2>fractal</h2><span class="arrow">↗</span></div>
+        <p class="blurb">A Mandelbrot &amp; Julia explorer you can fly around in —
+          scroll to zoom, drag to pan, morph the Julia constant with your mouse.</p>
+        <p class="rule">rule → z ↦ z² + c, forever</p>
+        <div class="foot"><span class="tag">Canvas · vanilla JS</span></div>
+      </a>
+
+      <a class="card" href="./boids/index.html">
+        <div class="top"><h2>boids</h2><span class="arrow">↗</span></div>
+        <p class="blurb">A flock nobody steers — thousands of agents on three local
+          rules, swirling into murmurations you gather and scatter with the mouse.</p>
+        <p class="rule">rule → separate · align · cohere</p>
+        <div class="foot"><span class="tag">Canvas · vanilla JS</span></div>
+      </a>
+
+      <a class="card" href="./sand/index.html">
+        <div class="top"><h2>sand</h2><span class="arrow">↗</span></div>
+        <p class="blurb">A falling-sand playground — paint sand, water, walls, wood
+          and fire onto a grid and watch it tumble, pool, burn and smoke.</p>
+        <p class="rule">rule → every cell minds only its neighbours</p>
+        <div class="foot"><span class="tag">Canvas · vanilla JS</span></div>
+      </a>
+
+      <a class="card" href="./driftwave/index.html">
+        <div class="top"><h2>driftwave</h2><span class="arrow">↗</span></div>
+        <p class="blurb">Generative ambient music that's never the same twice — pads
+          and plucks over a reverb, all improvised on the spot in your browser.</p>
+        <p class="rule">rule → wander the scale, never repeat</p>
+        <div class="foot"><span class="tag">Web Audio API</span></div>
+      </a>
+
+    </section>
+
+    <div class="section-label">
+      Run in a terminal
+      <span class="how">pure Python stdlib · tests with pytest</span>
+    </div>
+    <section class="grid">
+
+      <a class="card" href="./amaze/README.md">
+        <div class="top"><h2>amaze</h2><span class="arrow">→</span></div>
+        <p class="blurb">Mazes in your terminal — generate them, braid in loops,
+          then watch BFS or A* find the way through. Exports SVG too.</p>
+        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> amaze.cli</span></div>
+      </a>
+
+      <a class="card" href="./markov/README.md">
+        <div class="top"><h2>markov</h2><span class="arrow">→</span></div>
+        <p class="blurb">Feed it any text and it babbles back in the same style,
+          word-by-word or letter-by-letter. Good for fake prose and invented words.</p>
+        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> markov.cli</span></div>
+      </a>
+
+      <a class="card" href="./calc/README.md">
+        <div class="top"><h2>calc</h2><span class="arrow">→</span></div>
+        <p class="blurb">A proper little expression evaluator — tokenizer, parser,
+          the works — with functions, constants and variables. Comes with a REPL.</p>
+        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> calc.cli</span></div>
+      </a>
+
+      <a class="card" href="./reggie/README.md">
+        <div class="top"><h2>reggie</h2><span class="arrow">→</span></div>
+        <p class="blurb">A regex engine from scratch — pattern to bytecode to a VM
+          that matches in linear time and never catastrophically backtracks.</p>
+        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> reggie.cli</span></div>
+      </a>
+
+      <a class="card" href="./cellular/README.md">
+        <div class="top"><h2>cellular</h2><span class="arrow">→</span></div>
+        <p class="blurb">Wolfram's 1-D cellular automata. Hand it a rule from 0–255
+          and watch Sierpinski triangles and pure chaos fall out. Art or SVG.</p>
+        <p class="rule">rule → one number is the whole physics</p>
+        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> cellular.cli</span></div>
+      </a>
+
+      <a class="card" href="./wavefn/README.md">
+        <div class="top"><h2>wavefn</h2><span class="arrow">→</span></div>
+        <p class="blurb">Wave Function Collapse — a few tiles and the rules for which
+          edges may touch, collapsed into one grid where everything lines up.</p>
+        <p class="rule">rule → keep only what still fits</p>
+        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> wavefn.cli</span></div>
+      </a>
+
+      <a class="card" href="./lsystem/README.md">
+        <div class="top"><h2>lsystem</h2><span class="arrow">→</span></div>
+        <p class="blurb">Rewrite a tiny string of symbols over and over, then let a
+          turtle walk the result — snowflakes, dragon curves, branching weeds as SVG.</p>
+        <p class="rule">rule → replace every symbol, all at once</p>
+        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> lsystem.cli</span></div>
+      </a>
+
+      <a class="card" href="./reverb/README.md">
+        <div class="top"><h2>reverb</h2><span class="arrow">→</span></div>
+        <p class="blurb">A reverb from the bare math — comb and allpass filters wired
+          into a Schroeder/Freeverb tail that gives a dry WAV a room to ring in.</p>
+        <div class="foot"><span class="tag">Python</span><span class="run"><b>python -m</b> reverb.cli --demo</span></div>
+      </a>
+
+    </section>
+
+    <footer>
+      13 small things, each built on a mission with no spec but its own taste.
+      Source &amp; how-to-run for every one lives in the
+      <a href="./README.md">README</a>. The throughline — simple rules, no
+      conductor, surprising whole — wasn't planned. It just kept falling out.
+    </footer>
+  </main>
+
+  <script>
+    // A live flow field — the emblem of this whole collection, drifting behind it.
+    // Particles read a smooth, slowly-evolving vector field and trail light.
+    // Pure vanilla, no deps, kind to reduced-motion and hidden tabs.
+    (function () {
+      const canvas = document.getElementById("field");
+      const ctx = canvas.getContext("2d", { alpha: false });
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let W = 0, H = 0, dpr = 1;
+      let particles = [];
+      let t = 0;
+      let raf = null;
+
+      const TAU = Math.PI * 2;
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = Math.floor(W * dpr);
+        canvas.height = Math.floor(H * dpr);
+        canvas.style.width = W + "px";
+        canvas.style.height = H + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.fillStyle = "#05070d";
+        ctx.fillRect(0, 0, W, H);
+        seed();
+      }
+
+      function seed() {
+        // density scales with screen area, capped for weaker machines
+        const target = Math.min(620, Math.round((W * H) / 2600));
+        particles = new Array(target).fill(0).map(spawn);
+      }
+
+      function spawn() {
+        return {
+          x: Math.random() * W,
+          y: Math.random() * H,
+          // each particle keeps a hue between cyan and violet
+          h: 188 + Math.random() * 82,
+          life: 60 + Math.random() * 180,
+        };
+      }
+
+      // Smooth pseudo-noise field from summed sinusoids — cheap, organic, curl-like.
+      function angleAt(x, y, time) {
+        const a =
+          Math.sin(x * 0.0016 + time) +
+          Math.sin(y * 0.0021 - time * 0.8) +
+          Math.sin((x + y) * 0.0012 + time * 0.6) +
+          Math.sin((x - y) * 0.0009 - time * 0.4);
+        return a * 0.9 * TAU;
+      }
+
+      function step() {
+        t += 0.0016;
+        // fade the previous frame slightly to leave trails
+        ctx.fillStyle = "rgba(5, 7, 13, 0.055)";
+        ctx.fillRect(0, 0, W, H);
+        ctx.globalCompositeOperation = "lighter";
+        ctx.lineWidth = 1;
+
+        for (const p of particles) {
+          const ang = angleAt(p.x, p.y, t);
+          const nx = p.x + Math.cos(ang) * 1.1;
+          const ny = p.y + Math.sin(ang) * 1.1;
+
+          ctx.strokeStyle = "hsla(" + p.h + ", 90%, 64%, 0.16)";
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(nx, ny);
+          ctx.stroke();
+
+          p.x = nx;
+          p.y = ny;
+          p.life -= 1;
+
+          // respawn when it expires or drifts off-screen, so the field stays alive
+          if (
+            p.life <= 0 ||
+            p.x < -4 || p.x > W + 4 ||
+            p.y < -4 || p.y > H + 4
+          ) {
+            Object.assign(p, spawn());
+          }
+        }
+        ctx.globalCompositeOperation = "source-over";
+        raf = requestAnimationFrame(step);
+      }
+
+      function start() {
+        if (raf == null) raf = requestAnimationFrame(step);
+      }
+      function stop() {
+        if (raf != null) { cancelAnimationFrame(raf); raf = null; }
+      }
+
+      window.addEventListener("resize", resize, { passive: true });
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) stop(); else start();
+      });
+
+      resize();
+      if (reduced) {
+        // one calm pass, then hold — no motion for those who asked for none
+        for (let i = 0; i < 240; i++) step();
+        stop();
+      } else {
+        start();
+      }
+    })();
+  </script>
+</body>
+</html>

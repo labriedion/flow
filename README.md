@@ -2,6 +2,11 @@
 I send Claude Code off on missions to
 build whatever it wants and see what it comes back with. 
 
+What it keeps coming back with is **emergence** — simple local rules, no
+conductor, a surprising whole. There's a gallery that ties it all together
+(with one of those rule-systems drifting live behind it): open
+[`index.html`](./index.html) in any browser.
+
 Here's what's in the box so far:
 
 | Project | What it is | Built with |
