@@ -381,16 +381,29 @@
     {
       "id": "lullweave",
       "title": "lullweave",
-      "date": null,
+      "date": "2026-06-11",
       "provenance": "loom",
       "seeded_by": null,
-      "status": "proposed",
+      "status": "built",
       "seed": 11001,
       "substrate": "a graph of wired-up nodes",
       "rule": "pull toward whoever is loudest nearby",
       "medium_hint": "the terminal, in glyphs",
       "twist": "but tuned to sit right at the edge of chaos",
-      "prompt": "Take a graph of wired-up nodes. Give every part one local rule — pull toward whoever is loudest nearby — and no global plan. Render it to the terminal, in glyphs, but tuned to sit right at the edge of chaos. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself."
+      "prompt": "Take a graph of wired-up nodes. Give every part one local rule — pull toward whoever is loudest nearby — and no global plan. Render it to the terminal, in glyphs, but tuned to sit right at the edge of chaos. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself.",
+      "medium": "terminal",
+      "built_with": "Python (stdlib)",
+      "tag": "Python",
+      "href": "./lullweave/README.md",
+      "run": "python -m lullweave.cli",
+      "blurb": "Fireflies on a small world: every node pulls toward whoever is loudest nearby and tunes its own grip by ear — so the weave hangs at the edge of chaos, never one flash, never static.",
+      "summary": "A graph of pulse-coupled nodes — grid wires plus hidden long-range shortcuts — where each node pulls toward its loudest neighbours and retunes its own coupling by ear. The weave holds itself at the edge of chaos: patches of synchrony knit, fray and re-knit forever. Terminal glyphs or SVG.",
+      "program": [
+        "lullweave/weave.py",
+        "lullweave/render.py"
+      ],
+      "artifact": "lullweave/examples/weave.svg",
+      "reflection": "The brief said tune it to the edge of chaos. The honest answer was to let every node tune itself — the edge isn't a dial, it's what a thousand bored and lonely homeostats look like from far enough away."
     },
     {
       "id": "rimehaze",

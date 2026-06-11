@@ -29,6 +29,7 @@ registry by [`loom`](./loom) — see below):
 | [**fenchurn**](./fenchurn) | A heap of edge-matching tiles where every tile averages toward its neighbours — so edge-matching emerges, seams stitch themselves shut, and the one cell that disobeys slowly recolours the whole quilt. Terminal art or SVG with glowing stitches. | Python (stdlib) |
 | [**saltcrawl**](./saltcrawl) | A swarm of drifting grains with one rule — split in two past a threshold — on a torus. Crowding starves the interior into salt while the frontier keeps splitting, and the colony's whole family tree becomes the picture. Terminal art or SVG. | Python (stdlib) |
 | [**glintveil**](./glintveil) | Gray–Scott reaction–diffusion you can poke with the mouse. Two chemicals share a lattice — one fed, one killed — and coral fronts, mazes and dividing spots bloom out of two lines of math. Six regimes plus the whole parameter plane between them. | Canvas + vanilla JS |
+| [**lullweave**](./lullweave) | A graph of pulse-coupled nodes — grid wires plus hidden long-range shortcuts — where each node pulls toward its loudest neighbours and retunes its own coupling by ear. The weave holds itself at the edge of chaos: patches of synchrony knit, fray and re-knit forever. Terminal glyphs or SVG. | Python (stdlib) |
 <!-- loom:table:end -->
 
 **[loom](./loom)** is the odd one out: not another emergent toy but the engine
