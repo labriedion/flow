@@ -5,9 +5,6 @@
 // on-canvas painting — left-drag lays down the selected material, right-drag
 // erases — which is the whole point of a sand toy.
 
-import { Sandbox, MATERIALS } from './sim.js';
-import { Renderer } from './sand.js';
-
 const canvas = document.getElementById('stage');
 
 // The grid stays a fixed, modest resolution and the canvas scales it up. Bigger

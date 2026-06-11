@@ -2,7 +2,7 @@
 // Each palette is a name plus a background color and an array of stop colors
 // sampled along the particle's "age" / angle to produce smooth gradients.
 
-export const PALETTES = [
+const PALETTES = [
   {
     name: 'Aurora',
     bg: '#05070d',
@@ -53,7 +53,7 @@ function hexToRgb(hex) {
 
 // Pre-compute a 256-entry lookup table of "rgb(...)" strings for a palette so
 // per-particle coloring is a single array index instead of repeated math.
-export function buildRamp(palette, alpha = 1) {
+function buildRamp(palette, alpha = 1) {
   const stops = palette.stops.map(hexToRgb);
   const ramp = new Array(256);
   const segments = stops.length - 1;

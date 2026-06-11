@@ -46,7 +46,7 @@ Open [`index.html`](./index.html) in any modern browser. No server, no build.
 
 ```
 glintveil/
-  sim.js          # the field — pure ES module, no DOM, seedable, testable
+  sim.js          # the field — pure script, no DOM, seedable, Node-testable
   main.js         # renderer + UI: colour ramp, pointer poking, presets
   index.html      # the page
   style.css       # the chrome

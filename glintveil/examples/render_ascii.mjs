@@ -8,7 +8,10 @@
 //
 //   node glintveil/examples/render_ascii.mjs > glintveil/examples/sample_output.txt
 
-import { Field, PRESETS } from '../sim.js';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const { Field, PRESETS } = require('../sim.js');
 
 const W = 144, H = 96, SEED = 7002, STEPS = 6000;
 const preset = PRESETS.coral;

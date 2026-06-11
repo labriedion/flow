@@ -1,6 +1,4 @@
 // main.js — wires the UI to the Flock engine and runs the render loop.
-import { Flock } from './boids.js';
-import { PALETTES } from './palettes.js';
 
 const canvas = document.getElementById('stage');
 const flock = new Flock(canvas);

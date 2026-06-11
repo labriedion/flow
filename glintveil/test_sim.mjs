@@ -7,7 +7,12 @@
 //   node glintveil/test_sim.mjs
 
 import assert from 'node:assert/strict';
-import { Field, PRESETS } from './sim.js';
+import { createRequire } from 'node:module';
+
+// sim.js is a classic script with a CommonJS shim (so the browser can load
+// it straight off the disk); require() is how Node reads that shape.
+const require = createRequire(import.meta.url);
+const { Field, PRESETS } = require('./sim.js');
 
 let passed = 0;
 function test(name, fn) {

@@ -1,4 +1,4 @@
-// sim.js — a falling-sand / cellular-physics playground, as a pure ES module.
+// sim.js — a falling-sand / cellular-physics playground, as a pure script.
 //
 // This is `cellular` grown a second dimension and given a handful of materials
 // that fall, flow, burn and smoulder. The whole world is one flat `Uint8Array`
@@ -17,7 +17,7 @@
 //   density  — heavier things sink through lighter ones (SAND through WATER).
 //   solid    — counts as a fixed obstacle for falling things.
 // EMPTY is id 0 so a freshly-zeroed grid is already empty.
-export const MATERIALS = {
+const MATERIALS = {
   EMPTY: { id: 0, name: 'Empty', color: [7, 9, 16], density: 0, solid: false },
   SAND:  { id: 1, name: 'Sand',  color: [222, 184, 110], density: 3, solid: true },
   WATER: { id: 2, name: 'Water', color: [64, 130, 210], density: 1, solid: false },
@@ -28,20 +28,20 @@ export const MATERIALS = {
 };
 
 // Reverse lookup id -> material, handy for the renderer and for debugging.
-export const BY_ID = (() => {
+const BY_ID = (() => {
   const arr = [];
   for (const m of Object.values(MATERIALS)) arr[m.id] = m;
   return arr;
 })();
 
 // Bare ids, the form the engine actually shuffles around.
-export const EMPTY = MATERIALS.EMPTY.id;
-export const SAND  = MATERIALS.SAND.id;
-export const WATER = MATERIALS.WATER.id;
-export const WALL  = MATERIALS.WALL.id;
-export const WOOD  = MATERIALS.WOOD.id;
-export const FIRE  = MATERIALS.FIRE.id;
-export const SMOKE = MATERIALS.SMOKE.id;
+const EMPTY = MATERIALS.EMPTY.id;
+const SAND  = MATERIALS.SAND.id;
+const WATER = MATERIALS.WATER.id;
+const WALL  = MATERIALS.WALL.id;
+const WOOD  = MATERIALS.WOOD.id;
+const FIRE  = MATERIALS.FIRE.id;
+const SMOKE = MATERIALS.SMOKE.id;
 
 // How long (in ticks) a freshly-lit fire or puff of smoke lasts before it dies.
 const FIRE_LIFE = 70;
@@ -61,7 +61,7 @@ function mulberry32(seed) {
   };
 }
 
-export class Sandbox {
+class Sandbox {
   constructor(width = 200, height = 150, seed = 1) {
     this.width = width | 0;
     this.height = height | 0;
@@ -275,4 +275,14 @@ export class Sandbox {
     for (let k = 0; k < c.length; k++) if (c[k] === material) n++;
     return n;
   }
+}
+
+// Node (the tests and the headless artifact) loads this very file through
+// require(); the browser just reads the declarations off the shared script
+// scope. Deliberately no module syntax — module scripts refuse to load from
+// file://, and double-click-to-run is house law.
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    MATERIALS, BY_ID, EMPTY, SAND, WATER, WALL, WOOD, FIRE, SMOKE, Sandbox,
+  };
 }

@@ -7,9 +7,14 @@
 //   node sand/test_sim.mjs
 
 import assert from 'node:assert/strict';
-import {
+import { createRequire } from 'node:module';
+
+// sim.js is a classic script with a CommonJS shim (so the browser can load
+// it straight off the disk); require() is how Node reads that shape.
+const require = createRequire(import.meta.url);
+const {
   Sandbox, EMPTY, SAND, WATER, WALL, WOOD, FIRE, SMOKE,
-} from './sim.js';
+} = require('./sim.js');
 
 let passed = 0;
 function test(name, fn) {

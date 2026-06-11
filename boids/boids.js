@@ -9,11 +9,9 @@
 // flock is entirely emergent. A uniform spatial-hash grid keeps neighbour
 // lookups near O(n), so this stays smooth with thousands of boids.
 
-import { PALETTES } from './palettes.js';
-
 const TAU = Math.PI * 2;
 
-export class Flock {
+class Flock {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d', { alpha: false });
