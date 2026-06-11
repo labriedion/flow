@@ -288,30 +288,56 @@
     {
       "id": "fenchurn",
       "title": "fenchurn",
-      "date": null,
+      "date": "2026-06-11",
       "provenance": "loom",
       "seeded_by": null,
-      "status": "proposed",
+      "status": "built",
       "seed": 7000,
       "substrate": "a heap of edge-matching tiles",
       "rule": "average yourself toward your neighbours",
       "medium_hint": "a standalone SVG",
       "twist": "but with one cell that disobeys",
-      "prompt": "Take a heap of edge-matching tiles. Give every part one local rule — average yourself toward your neighbours — and no global plan. Render it to a standalone SVG, but with one cell that disobeys. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself."
+      "prompt": "Take a heap of edge-matching tiles. Give every part one local rule — average yourself toward your neighbours — and no global plan. Render it to a standalone SVG, but with one cell that disobeys. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself.",
+      "medium": "terminal",
+      "built_with": "Python (stdlib)",
+      "tag": "Python",
+      "href": "./fenchurn/README.md",
+      "run": "python -m fenchurn.cli",
+      "blurb": "A heap of clashing tiles averages itself into one quilt — except one cell never averages, and its colour slowly takes everything.",
+      "summary": "A heap of edge-matching tiles where every tile averages toward its neighbours — so edge-matching emerges, seams stitch themselves shut, and the one cell that disobeys slowly recolours the whole quilt. Terminal art or SVG with glowing stitches.",
+      "program": [
+        "fenchurn/quilt.py",
+        "fenchurn/render.py"
+      ],
+      "artifact": "fenchurn/examples/quilt.svg",
+      "reflection": "The cell that refused to average ends up averaging everyone. The twist loom asked for turned out to be the whole story."
     },
     {
       "id": "saltcrawl",
       "title": "saltcrawl",
-      "date": null,
+      "date": "2026-06-11",
       "provenance": "loom",
       "seeded_by": null,
-      "status": "proposed",
+      "status": "built",
       "seed": 7001,
       "substrate": "a swarm of drifting particles",
       "rule": "split in two whenever you grow past a threshold",
       "medium_hint": "a standalone SVG",
       "twist": "but wrap the boundary so it has no edge",
-      "prompt": "Take a swarm of drifting particles. Give every part one local rule — split in two whenever you grow past a threshold — and no global plan. Render it to a standalone SVG, but wrap the boundary so it has no edge. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself."
+      "prompt": "Take a swarm of drifting particles. Give every part one local rule — split in two whenever you grow past a threshold — and no global plan. Render it to a standalone SVG, but wrap the boundary so it has no edge. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself.",
+      "medium": "terminal",
+      "built_with": "Python (stdlib)",
+      "tag": "Python",
+      "href": "./saltcrawl/README.md",
+      "run": "python -m saltcrawl.cli",
+      "blurb": "Grains that drift, feed and split when full — crowding starves the heart still while the frontier crawls on across a world that wraps.",
+      "summary": "A swarm of drifting grains with one rule — split in two past a threshold — on a torus. Crowding starves the interior into salt while the frontier keeps splitting, and the colony's whole family tree becomes the picture. Terminal art or SVG.",
+      "program": [
+        "saltcrawl/swarm.py",
+        "saltcrawl/render.py"
+      ],
+      "artifact": "saltcrawl/examples/crawl.svg",
+      "reflection": "The brief said only split past a threshold. Crowding had to throttle the feast before the swarm became a colony — the smallest extra coupling, and the whole shape lives in it."
     },
     {
       "id": "glintveil",
@@ -337,6 +363,48 @@
       ],
       "artifact": "glintveil/examples/sample_output.txt",
       "reflection": "The first mission loom proposed that came back built — the loop it called its horizon, closed once. The brief said surprise yourself; the coral did."
+    },
+    {
+      "id": "driftlace",
+      "title": "driftlace",
+      "date": null,
+      "provenance": "loom",
+      "seeded_by": "wavefn",
+      "status": "proposed",
+      "seed": 11000,
+      "substrate": "a grid of cells",
+      "rule": "react and diffuse with the chemical beside you",
+      "medium_hint": "a WAV you can actually play",
+      "twist": "but seeded from wavefn's output",
+      "prompt": "Take a grid of cells. Give every part one local rule — react and diffuse with the chemical beside you — and no global plan. Render it to a WAV you can actually play, but seeded from wavefn's output. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself."
+    },
+    {
+      "id": "lullweave",
+      "title": "lullweave",
+      "date": null,
+      "provenance": "loom",
+      "seeded_by": null,
+      "status": "proposed",
+      "seed": 11001,
+      "substrate": "a graph of wired-up nodes",
+      "rule": "pull toward whoever is loudest nearby",
+      "medium_hint": "the terminal, in glyphs",
+      "twist": "but tuned to sit right at the edge of chaos",
+      "prompt": "Take a graph of wired-up nodes. Give every part one local rule — pull toward whoever is loudest nearby — and no global plan. Render it to the terminal, in glyphs, but tuned to sit right at the edge of chaos. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself."
+    },
+    {
+      "id": "rimehaze",
+      "title": "rimehaze",
+      "date": null,
+      "provenance": "loom",
+      "seeded_by": null,
+      "status": "proposed",
+      "seed": 11002,
+      "substrate": "a heap of edge-matching tiles",
+      "rule": "pull toward whoever is loudest nearby",
+      "medium_hint": "a WAV you can actually play",
+      "twist": "but let the viewer edit the rule while it runs",
+      "prompt": "Take a heap of edge-matching tiles. Give every part one local rule — pull toward whoever is loudest nearby — and no global plan. Render it to a WAV you can actually play, but let the viewer edit the rule while it runs. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself."
     }
   ]
 }

@@ -1,6 +1,6 @@
 # loom
 
-The other thirteen-and-one things in [`flow`](../) are emergent systems: simple
+The other fifteen-and-one things in [`flow`](../) are emergent systems: simple
 local rules, no conductor, a surprising whole. **loom is the move that makes the
 collection itself one of them.**
 
@@ -84,9 +84,11 @@ mission); a future `loom run` could call an API to close it fully. That step is
 real research and infrastructure, not a flag we pretend to have planted — the
 subjective "did this delight me?" at its core is still open.
 
-The seam has been crossed once: [`glintveil`](../glintveil) (seed 7002) was
-proposed by loom, sat "on the loom" in the gallery, and was then built by an
-agent that was handed the repo and told *do what you want* — the registry's
-first `provenance: loom` entry with `status: built`. The carrying-across was
-still human-shaped (someone had to hand over the keys), but the brief itself
-was never written by a person.
+The seam has been crossed: [`glintveil`](../glintveil) (seed 7002),
+[`fenchurn`](../fenchurn) (seed 7000) and [`saltcrawl`](../saltcrawl)
+(seed 7001) were all proposed by loom, sat "on the loom" in the gallery, and
+were then built by an agent that was handed the repo and told *do what you
+want* — the registry's first `provenance: loom` entries with `status: built`.
+The carrying-across was still human-shaped (someone had to hand over the
+keys), but none of those three briefs was written by a person — and the agent
+restocked the loom on its way out, so there is always cloth on it.
