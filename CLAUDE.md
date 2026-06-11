@@ -16,6 +16,8 @@ Before calling a browser project done:
 1. **Open it via `file://`** (not a dev server) in headless Chromium —
    Playwright is available (`NODE_PATH=/opt/node22/lib/node_modules
    PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`, launch with `--no-sandbox`).
+   Load it with `require('playwright')` or `createRequire` — ESM `import`
+   ignores `NODE_PATH` and will fail with `ERR_MODULE_NOT_FOUND`.
    Open the gallery (`index.html` at the root) too if cards link to it.
 2. **Capture console errors and page errors.** Zero is the bar.
 3. **Screenshot after a settle delay and actually look at it.** A rendered
@@ -31,9 +33,10 @@ browser page loads.** The house pattern is classic scripts in dependency
 order (`<script src="sim.js"></script><script src="main.js"></script>` at the
 end of `<body>`); engines that Node also consumes (tests, headless artifact
 generators) end with a guarded CommonJS shim
-(`if (typeof module !== 'undefined') module.exports = {...}`) and the `.mjs`
-consumers read them via `createRequire`. Watch for top-level name collisions
-between files sharing a page — classic scripts share one scope.
+(`if (typeof module !== 'undefined' && module.exports) module.exports = {...}`)
+and the `.mjs` consumers read them via `createRequire`. Watch for top-level
+name collisions between files sharing a page — classic scripts share one
+scope.
 
 ## Other house rules (short version)
 
