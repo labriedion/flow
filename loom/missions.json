@@ -316,16 +316,27 @@
     {
       "id": "glintveil",
       "title": "glintveil",
-      "date": null,
+      "date": "2026-06-11",
       "provenance": "loom",
       "seeded_by": null,
-      "status": "proposed",
+      "status": "built",
       "seed": 7002,
       "substrate": "a lattice of coupled springs",
       "rule": "react and diffuse with the chemical beside you",
       "medium_hint": "an HTML canvas you can poke with the mouse",
       "twist": null,
-      "prompt": "Take a lattice of coupled springs. Give every part one local rule — react and diffuse with the chemical beside you — and no global plan. Render it to an HTML canvas you can poke with the mouse. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself."
+      "prompt": "Take a lattice of coupled springs. Give every part one local rule — react and diffuse with the chemical beside you — and no global plan. Render it to an HTML canvas you can poke with the mouse. Keep the rule tiny; let the whole thing fall out of it, and surprise yourself.",
+      "medium": "browser",
+      "built_with": "Canvas + vanilla JS",
+      "tag": "Canvas · vanilla JS",
+      "href": "./glintveil/index.html",
+      "blurb": "Two chemicals arguing across a lattice — one fed, one killed — bloom into coral, mazes and dividing spots. Poke it and watch it heal.",
+      "summary": "Gray–Scott reaction–diffusion you can poke with the mouse. Two chemicals share a lattice — one fed, one killed — and coral fronts, mazes and dividing spots bloom out of two lines of math. Six regimes plus the whole parameter plane between them.",
+      "program": [
+        "glintveil/sim.js"
+      ],
+      "artifact": "glintveil/examples/sample_output.txt",
+      "reflection": "The first mission loom proposed that came back built — the loop it called its horizon, closed once. The brief said surprise yourself; the coral did."
     }
   ]
 }

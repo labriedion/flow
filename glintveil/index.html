@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glintveil — Reaction–Diffusion Field</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <aside id="panel">
+    <h1>Glintveil</h1>
+    <div class="sub">react &amp; diffuse, with a mouse</div>
+
+    <div class="palette" id="presets"></div>
+
+    <div class="control">
+      <label>Feed <span class="val" id="feedVal"></span></label>
+      <input type="range" id="feed" min="0.005" max="0.09" step="0.0005" value="0.0545" />
+    </div>
+    <div class="control">
+      <label>Kill <span class="val" id="killVal"></span></label>
+      <input type="range" id="kill" min="0.04" max="0.07" step="0.0005" value="0.062" />
+    </div>
+    <div class="control">
+      <label>Brush Size <span class="val" id="brushVal"></span></label>
+      <input type="range" id="brush" min="1" max="20" step="1" value="5" />
+    </div>
+    <div class="control">
+      <label>Sim Speed <span class="val" id="speedVal"></span></label>
+      <input type="range" id="speed" min="1" max="24" step="1" value="10" />
+    </div>
+
+    <div class="buttons">
+      <button id="pause">Pause</button>
+      <button id="reseed">Reseed</button>
+      <button id="clear">Clear</button>
+      <button id="save" class="wide">Save PNG ⬇</button>
+    </div>
+
+    <div class="hint">
+      Hold <kbd>left-click</kbd> to pour chemical · <kbd>right-click</kbd> to erase.<br />
+      <kbd>1</kbd>–<kbd>6</kbd> pick a regime · <kbd>Space</kbd> pause ·
+      <kbd>R</kbd> reseed · <kbd>C</kbd> clear · <kbd>S</kbd> save ·
+      <kbd>H</kbd> hide panel.
+    </div>
+  </aside>
+  <button id="togglePanel" title="Show controls">☰</button>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
