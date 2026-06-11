@@ -50,13 +50,20 @@ class Quilt:
 
         # The disobedient cell. "center" puts it mid-heap; None removes it
         # entirely (useful for proving conservation); an (x, y) pair places it.
+        # Coordinates are checked strictly: a negative index would seed one
+        # tile while _is_rebel watched another, and that tile would quietly
+        # average after all — the one thing a rebel must never do.
         if rebel == "center":
             rebel = (width // 2, height // 2)
-        self.rebel = rebel
-        self.rebel_value = rebel_value
         if rebel is not None:
             rx, ry = rebel
+            if not (0 <= rx < width and 0 <= ry < height):
+                raise ValueError(
+                    f"rebel {rebel!r} is outside the {width}x{height} heap")
+            rebel = (rx, ry)
             self.tiles[ry][rx] = [rebel_value] * 4
+        self.rebel = rebel
+        self.rebel_value = rebel_value
 
         self.tick = 0
 

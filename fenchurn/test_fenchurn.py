@@ -2,8 +2,19 @@
 
 import xml.etree.ElementTree as ET
 
+import pytest
+
 from .quilt import Quilt
 from .render import render_svg
+
+
+def test_a_rebel_off_the_heap_is_rejected():
+    """Out-of-range rebels must fail loudly: a negative index would seed one
+    tile while _is_rebel watched another, and that 'rebel' would quietly
+    average like everyone else."""
+    for bad in ((100, 100), (-1, -1), (0, 8), (10, 0)):
+        with pytest.raises(ValueError):
+            Quilt(10, 8, rebel=bad)
 
 
 def test_same_seed_same_quilt():

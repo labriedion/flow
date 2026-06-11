@@ -65,17 +65,27 @@ test('one poke spreads structure far beyond its own footprint', () => {
 // ---- the lattice is a torus ----------------------------------------------
 test('patterns cross the boundary: the field has no edge', () => {
   const f = new Field(64, 64, 3);
-  f.poke(0, 0, 3); // a poke at the corner...
+  const colCells = (x, eps) => {
+    let n = 0;
+    for (let y = 0; y < f.height; y++) {
+      if (f.v[y * f.width + x] > eps) n++;
+    }
+    return n;
+  };
+  // A poke hugging the left edge (x 0..4) — the far column starts silent,
+  // so anything that shows up there later had to *travel*.
+  f.poke(2, 32, 2);
+  assert.equal(colCells(f.width - 1, 0), 0, 'far column starts silent');
   for (let i = 0; i < 1200; i++) f.step();
-  // ...shows up on the far side, because the corner's neighbours live there.
-  let farSide = 0;
-  for (let y = 0; y < f.height; y++) {
-    if (f.v[y * f.width + (f.width - 2)] > 0.05) farSide++;
-  }
-  assert.ok(farSide > 0, 'v crossed the wrap onto the far column');
-  // Wildly out-of-range pokes wrap too, instead of throwing or vanishing.
-  f.poke(-1000, 99999, 2);
-  assert.ok(f.stats().vMax > 0, 'off-grid poke landed somewhere on the torus');
+  // The pattern's front could not have crawled 59 columns rightward in this
+  // time (see the growth test); reaching the far column means it stepped
+  // across the wrap from column 0 — the seam diffuses like anywhere else.
+  assert.ok(colCells(f.width - 1, 0.05) > 0, 'v crossed the wrap onto the far column');
+  // Wildly out-of-range pokes wrap too, instead of throwing or vanishing —
+  // checked on a fresh, silent field so the landing actually proves it.
+  const g = new Field(32, 32, 4);
+  g.poke(-1000, 99999, 2);
+  assert.ok(g.stats().vMax > 0, 'off-grid poke landed somewhere on the torus');
 });
 
 // ---- the field never blows up --------------------------------------------

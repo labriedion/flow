@@ -52,7 +52,9 @@ class Swarm:
         self.wiggle = wiggle            # heading wobble (radians, stddev)
         self.split_angle = split_angle  # how hard children veer apart
         self.crowd_radius = crowd_radius  # binning scale for crowd counts
-        self.cap = cap                  # safety bound on the population
+        # Safety bound on the population. The first grain always exists, so a
+        # cap below 1 couldn't be honoured — clamp rather than overpromise.
+        self.cap = max(1, cap)
 
         # One grain, mid-world, pointed wherever the seed says.
         first = Grain(self.width / 2, self.height / 2,
@@ -64,7 +66,11 @@ class Swarm:
     # ---- the torus ----------------------------------------------------------
 
     def _wrap(self, v, span):
-        return v % span
+        # Float modulo can return span itself for a tiny negative v
+        # ((-1e-18) % 420.0 == 420.0), which would put a grain just off the
+        # world. Fold that hair's-breadth case back to zero.
+        v %= span
+        return v if v < span else 0.0
 
     def _crowd_counts(self):
         """Grains per coarse bin — the only thing a grain knows about others."""

@@ -61,11 +61,11 @@ still glowing. Regenerate it with
 python -m pytest fenchurn/ -q
 ```
 
-Seven checks: determinism by seed, a short run melts the heap's disagreement,
-the widest mid-run seam touches the rebel, the rebel never budges, the rebel
-recolours every tile and every seam closes around its value, the no-rebel
-quilt conserves its mean exactly and lands consensus on it, and the SVG is
-well-formed with one rect per tile.
+Eight checks: a rebel off the heap is rejected loudly, determinism by seed, a
+short run melts the heap's disagreement, the widest mid-run seam touches the
+rebel, the rebel never budges, the rebel recolours every tile and every seam
+closes around its value, the no-rebel quilt conserves its mean exactly and
+lands consensus on it, and the SVG is well-formed with one rect per tile.
 
 ## Files
 

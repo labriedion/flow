@@ -92,6 +92,11 @@ def test_population_respects_the_cap():
     s = Swarm(seed=8, cap=40)
     s.run(600)
     assert s.population() <= 40
+    # A cap below 1 can't be honoured (the first grain exists); it clamps to
+    # one lone grain that never splits.
+    lone = Swarm(seed=8, cap=0)
+    lone.run(200)
+    assert lone.population() == 1
 
 
 def test_svg_is_wellformed_and_draws_the_trails():
