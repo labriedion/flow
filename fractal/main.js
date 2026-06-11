@@ -4,7 +4,6 @@
 // at a chosen resolution, then blit it (scaled) onto the visible canvas. During
 // pans/zooms we render a low-res *preview* for responsiveness, then debounce a
 // crisp full-resolution pass once interaction settles.
-import { Fractal, PALETTE_PRESETS } from './fractal.js';
 
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d');

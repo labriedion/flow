@@ -25,7 +25,7 @@ function mulberry32(seed) {
   };
 }
 
-export class SimplexNoise {
+class SimplexNoise {
   constructor(seed = 1) {
     const rand = mulberry32(seed);
     const p = new Uint8Array(256);

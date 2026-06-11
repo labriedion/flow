@@ -1,6 +1,4 @@
 // main.js — wires the UI to the FlowField engine and runs the render loop.
-import { FlowField } from './flowfield.js';
-import { PALETTES } from './palettes.js';
 
 const canvas = document.getElementById('stage');
 const field = new FlowField(canvas);

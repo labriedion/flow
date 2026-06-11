@@ -49,7 +49,7 @@ const RAW = [
 ];
 
 // Export with bg/accent/stops parsed into numeric RGB.
-export const PALETTES = RAW.map((p) => ({
+const PALETTES = RAW.map((p) => ({
   name: p.name,
   bg: hexToRgb(p.bg),
   accent: hexToRgb(p.accent),

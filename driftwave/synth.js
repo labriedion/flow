@@ -10,7 +10,7 @@
 //    decay). Both feed a shared reverb built from a synthesized impulse.
 
 // Scale definitions as semitone offsets from the root.
-export const SCALES = {
+const SCALES = {
   'Major Pentatonic': [0, 2, 4, 7, 9],
   'Minor Pentatonic': [0, 3, 5, 7, 10],
   Dorian: [0, 2, 3, 5, 7, 9, 10],
@@ -19,14 +19,14 @@ export const SCALES = {
   Whole_Tone: [0, 2, 4, 6, 8, 10],
 };
 
-export const ROOTS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const ROOTS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 // MIDI note number -> frequency in Hz.
 function midiToFreq(m) {
   return 440 * Math.pow(2, (m - 69) / 12);
 }
 
-export class Driftwave {
+class Driftwave {
   constructor() {
     this.ctx = null;
     this.running = false;

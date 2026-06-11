@@ -8,7 +8,7 @@
 // Build a 1024-entry RGB palette from three phase-shifted cosines. Different
 // phase/frequency triples give very different moods; `buildPalette` bakes one
 // into a flat Uint8 array for fast lookup.
-export const PALETTE_PRESETS = {
+const PALETTE_PRESETS = {
   Inferno:   { freq: [1.0, 1.0, 1.0], phase: [0.0, 0.15, 0.30], bias: [0.5, 0.35, 0.2] },
   Ocean:     { freq: [0.8, 0.9, 1.1], phase: [0.6, 0.5, 0.2], bias: [0.2, 0.4, 0.6] },
   Acid:      { freq: [1.2, 1.0, 0.7], phase: [0.1, 0.45, 0.8], bias: [0.4, 0.6, 0.3] },
@@ -19,7 +19,7 @@ export const PALETTE_PRESETS = {
 const PALETTE_SIZE = 1024;
 const TAU = Math.PI * 2;
 
-export function buildPalette(preset) {
+function buildPalette(preset) {
   const { freq, phase, bias } = preset;
   const amp = 0.5;
   const out = new Uint8ClampedArray(PALETTE_SIZE * 3);
@@ -32,7 +32,7 @@ export function buildPalette(preset) {
   return out;
 }
 
-export class Fractal {
+class Fractal {
   constructor() {
     // The complex plane window: a center point and a vertical half-height
     // ("scale"). Horizontal extent is derived from the canvas aspect ratio.

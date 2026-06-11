@@ -1,4 +1,4 @@
-// sim.js — a Gray–Scott reaction–diffusion field, as a pure ES module.
+// sim.js — a Gray–Scott reaction–diffusion field, as a pure script.
 //
 // This is the loom-proposed mission `glintveil` (seed 7002): a lattice of
 // coupled springs whose one local rule is "react and diffuse with the chemical
@@ -21,7 +21,7 @@
 // Named feed/kill pairs from Pearson's classification of the Gray–Scott
 // parameter plane. Tiny nudges to f or k move you between regimes — the whole
 // "phase diagram in two knobs" is half the show.
-export const PRESETS = {
+const PRESETS = {
   coral:    { name: 'Coral',    feed: 0.0545, kill: 0.0620 },
   mitosis:  { name: 'Mitosis',  feed: 0.0367, kill: 0.0649 },
   maze:     { name: 'Maze',     feed: 0.0290, kill: 0.0570 },
@@ -30,7 +30,7 @@ export const PRESETS = {
   waves:    { name: 'Waves',    feed: 0.0140, kill: 0.0450 },
 };
 
-export const DEFAULT_PRESET = 'coral';
+const DEFAULT_PRESET = 'coral';
 
 // Diffusion rates for the 9-point Laplacian below, the classic stable pair.
 // u must out-diffuse v (the activator hoards, the substrate spreads) or no
@@ -52,7 +52,7 @@ function mulberry32(seed) {
   };
 }
 
-export class Field {
+class Field {
   constructor(width = 256, height = 192, seed = 1) {
     this.width = width | 0;
     this.height = height | 0;
@@ -204,4 +204,12 @@ export class Field {
     }
     return lines.join('\n');
   }
+}
+
+// Node (the tests and the headless artifact) loads this very file through
+// require(); the browser just reads the declarations off the shared script
+// scope. Deliberately no module syntax — module scripts refuse to load from
+// file://, and double-click-to-run is house law.
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { PRESETS, DEFAULT_PRESET, Field };
 }

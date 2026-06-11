@@ -1,5 +1,4 @@
 // main.js — UI wiring and the canvas visualizer for Driftwave.
-import { Driftwave, SCALES, ROOTS } from './synth.js';
 
 const engine = new Driftwave();
 

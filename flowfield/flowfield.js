@@ -4,12 +4,9 @@
 // dimension (time), so the whole picture breathes. Trails are produced by
 // fading the previous frame rather than clearing it.
 
-import { SimplexNoise } from './noise.js';
-import { PALETTES, buildRamp } from './palettes.js';
-
 const TAU = Math.PI * 2;
 
-export class FlowField {
+class FlowField {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d', { alpha: false });

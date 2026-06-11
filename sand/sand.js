@@ -7,9 +7,7 @@
 // That keeps the per-frame work proportional to the grid (tens of thousands of
 // cells) rather than the screen (millions of pixels).
 
-import { BY_ID } from './sim.js';
-
-export class Renderer {
+class Renderer {
   constructor(canvas, sim) {
     this.canvas = canvas;
     this.sim = sim;

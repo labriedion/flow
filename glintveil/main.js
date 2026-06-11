@@ -6,8 +6,6 @@
 // resolution, then scales it up smoothly — the veil look comes free from the
 // browser's bilinear filtering.
 
-import { Field, PRESETS, DEFAULT_PRESET } from './sim.js';
-
 const canvas = document.getElementById('stage');
 const ctx = canvas.getContext('2d');
 

@@ -10,7 +10,10 @@
 //
 //   node sand/examples/render_ascii.mjs > sand/examples/sample_output.txt
 
-import { Sandbox, EMPTY, SAND, WATER, WALL, WOOD, FIRE, SMOKE } from '../sim.js';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const { Sandbox, EMPTY, SAND, WATER, WALL, WOOD, FIRE, SMOKE } = require('../sim.js');
 
 // One glyph per material id, chosen so the snapshot reads at a glance.
 const GLYPH = {
