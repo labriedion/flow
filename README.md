@@ -26,6 +26,9 @@ registry by [`loom`](./loom) — see below):
 | [**reverb**](./reverb) | A reverb built from the bare math — comb and allpass filters wired into a Schroeder/Freeverb tail — that takes a dry WAV and gives it a room to ring in. Comes with a demo that invents its own sound to drench. | Python (stdlib) |
 | [**lsystem**](./lsystem) | Lindenmayer systems — rewrite a tiny string of symbols over and over, then let a turtle walk the result. Koch snowflakes, dragon curves, Hilbert space-fillers and branching weeds fall out as SVG. | Python (stdlib) |
 | [**sand**](./sand) | A falling-sand playground — paint sand, water, walls, wood and fire onto a grid and watch it tumble, pool, burn and smoke. `cellular` grown into 2D and handed a mouse. | Canvas + vanilla JS |
+| [**fenchurn**](./fenchurn) | A heap of edge-matching tiles where every tile averages toward its neighbours — so edge-matching emerges, seams stitch themselves shut, and the one cell that disobeys slowly recolours the whole quilt. Terminal art or SVG with glowing stitches. | Python (stdlib) |
+| [**saltcrawl**](./saltcrawl) | A swarm of drifting grains with one rule — split in two past a threshold — on a torus. Crowding starves the interior into salt while the frontier keeps splitting, and the colony's whole family tree becomes the picture. Terminal art or SVG. | Python (stdlib) |
+| [**glintveil**](./glintveil) | Gray–Scott reaction–diffusion you can poke with the mouse. Two chemicals share a lattice — one fed, one killed — and coral fronts, mazes and dividing spots bloom out of two lines of math. Six regimes plus the whole parameter plane between them. | Canvas + vanilla JS |
 <!-- loom:table:end -->
 
 **[loom](./loom)** is the odd one out: not another emergent toy but the engine
@@ -37,9 +40,10 @@ from that data. `python -m loom missions` to see the loop; details in
 
 ## Running them
 
-- **flowfield** / **fractal** / **driftwave** / **boids** / **sand** — open that project's
-  `index.html` in any modern browser. That's it, no server. (sand's engine also has a
-  headless smoke test: `node sand/test_sim.mjs`.)
+- **flowfield** / **fractal** / **driftwave** / **boids** / **sand** / **glintveil** — open
+  that project's `index.html` in any modern browser. That's it, no server. (sand and
+  glintveil also have headless smoke tests: `node sand/test_sim.mjs`,
+  `node glintveil/test_sim.mjs`.)
 - **amaze** — `python -m amaze.cli --width 30 --height 15`
   (tests: `python -m pytest amaze/ -q`)
 - **markov** — `python -m markov.cli markov/corpus.txt --order 2 --length 60`
@@ -58,3 +62,7 @@ from that data. `python -m loom missions` to see the loop; details in
   (tests: `python -m pytest reverb/ -q`)
 - **lsystem** — `python -m lsystem.cli --preset snowflake --iterations 4 -o snowflake.svg`,
   or `--list` to see them all (tests: `python -m pytest lsystem/ -q`)
+- **fenchurn** — `python -m fenchurn.cli`, or `-o quilt.svg` for the SVG
+  (tests: `python -m pytest fenchurn/ -q`)
+- **saltcrawl** — `python -m saltcrawl.cli`, or `-o crawl.svg` for the SVG
+  (tests: `python -m pytest saltcrawl/ -q`)
